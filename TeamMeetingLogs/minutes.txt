@@ -1,0 +1,5 @@
+Meeting 1 (10/28)
+- reviewed and got feedback on major app features with TA
+  - major pages/features: login, registration, home, classes, questions, profile
+- asked TA how to store images in our database
+  - solution: use cloud hosting (AWS) and store url in DB or directly store base64 encoding in DB. will need to explore both methods later.
