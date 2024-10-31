@@ -1,0 +1,18 @@
+<link rel="stylesheet" href="../../resources/css/style.css">
+{{> message}}
+<h2>Register</h2>
+<form class="c" method="post" action="/register">    
+    <div class="mb-3">
+        <label for="user" class="form-labelL">Username</label>
+        <input type="username" name="username" placeholder="Xbox"  class="form-control"/>
+    </div>
+    <div class="mb-3">
+        <label for="pasword" class="form-labelL">Password</label>
+        <input type="password" name="password" placeholder="Good Strong Password"  class="form-control"/>
+    </div>
+    <button type="submit" class="btn btn-solo">Register</button>
+</form>
+<p class="c">
+    Already have an account? 
+    <a href="./login">Login</a>
+</p> 
