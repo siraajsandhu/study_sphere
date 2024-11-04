@@ -60,6 +60,18 @@ app.get('/', (req, res) => {
   // res.redirect('/login');
 });
 
+
+//API route for profile
+app.get('/profile', (req, res) => {
+    res.render('pages/profile',{
+        username:req.session.username,
+        bookmarks:req.session.bookmarks,
+        question:req.session.qestion,
+        classname:req.session.classname
+    })
+});
+
+
 // start server
 app.listen(3000);
 console.log('Server listening on port 3000');
