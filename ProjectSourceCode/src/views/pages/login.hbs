@@ -1,0 +1,17 @@
+<link rel="stylesheet" href="../../resources/css/style.css">
+{{> message}}
+<h2 class="c">Login</h2>
+<form class="c" method="post" action="/login">    
+    <div class="mb-2">
+        <label for="user" class="form-labelL">Username</label>
+        <input type="username" name="username" placeholder="Gerrard"  class="form-control"/>
+    </div>
+    <div class="mb-2">
+        <label for="pasword" class="form-labelL">Password</label>
+        <input type="password" name="password" placeholder="Good Strong Password"  class="form-control"/>
+    </div>
+    <button type="submit" class="btn btn-solo">Login</button>
+</form>
+<p class="c"> Don't have an account? 
+    <a href="./register">Register</a>
+</p>
