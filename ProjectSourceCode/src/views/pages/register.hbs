@@ -1,7 +1,8 @@
 <link rel="stylesheet" href="../../resources/css/style.css">
 {{> message}}
 <h2>Register</h2>
-<form class="c" method="post" action="/register">    
+{{#if not_registered}}
+<form class="c" method="POST" action="/register">    
     <div class="mb-3">
         <label for="user" class="form-labelL">Username</label>
         <input type="username" name="username" placeholder="Xbox"  class="form-control"/>
@@ -15,4 +16,52 @@
 <p class="c">
     Already have an account? 
     <a href="./login">Login</a>
-</p> 
+</p>
+{{else}}
+<h5>Get started by adding classes!</h5>
+<form id="pref-form" method="POST" action="/register_preferences">
+    <div class="form-group">
+        <input id="search-class-prefs" type="search" list="class-list" placeholder="Look up a course number"/>
+        <button onclick="addClassPref()" class="btn btn-secondary" type="button">Add</button>
+    </div>
+    <div id="class-prefs-preview">
+        
+    </div>
+    <datalist id="class-list" name="class_prefs" multiple>
+        {{#each classes}}
+            <option>{{this}}</option>
+        {{/each}}
+    </datalist>
+    <select id="class-field" name="class_prefs" multiple style="display: none;">
+        {{#each classes}}
+            <option>{{this}}</option>
+        {{/each}}
+    </select>
+    <button type="submit" class="btn btn-primary">Finalize Preferences</button>
+    <p>Or <a href="/">skip</a></p>
+</form>
+<script>
+    document.getElementById('pref-form').reset();
+    function addClassPref() {
+        const searchBar = document.getElementById('search-class-prefs');
+        const key = searchBar.value;
+        const select = document.getElementById('class-field');
+        const options = [...select.options];
+        const option = options.find(o => o.value === key);
+        if (option && !option.selected) {
+            option.selected = true;
+            const button = document.createElement('button');
+            button.innerHTML = `${option.value} (-)`;
+            button.onclick = () => {
+                option.selected = false;
+                button.remove();
+            }
+            button.classList.add('btn', 'btn-outline-danger');
+            const preview = document.getElementById('class-prefs-preview');
+            preview.appendChild(button);
+        } else {
+            console.error(`option '${key}' does not exist`);
+        }
+    }
+</script>
+{{/if}}

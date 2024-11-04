@@ -51,13 +51,20 @@ app.use(
 
 // API routes
 app.get('/', (req, res) => {
-  // console.log('ASKING FOR HOME');
-  hbs.render("src/views/pages/home.hbs",{title:"Title",body:"Body"}).then((renderedHtml) => {
-    console.log(renderedHtml);
-  });
-
   res.render('pages/home', {});
-  // res.redirect('/login');
+});
+
+app.get('/register', (req, res) => {
+  res.render('pages/register', {not_registered: false, classes: [2400, 2270, 3308, 3104]});
+});
+
+app.post('/register_preferences', (req, res) => {
+  console.log(req.body);
+  res.redirect('/');
+});
+
+app.get('/login', (req, res) => {
+  res.render('pages/login');
 });
 
 // start server
