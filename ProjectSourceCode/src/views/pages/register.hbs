@@ -18,28 +18,35 @@
     <a href="./login">Login</a>
 </p>
 {{else}}
-<h5>Get started by adding classes!</h5>
-<form id="pref-form" method="POST" action="/register_preferences">
-    <div class="form-group">
-        <input id="search-class-prefs" type="search" list="class-list" placeholder="Look up a course number"/>
-        <button onclick="addClassPref()" class="btn btn-secondary" type="button">Add</button>
-    </div>
-    <div id="class-prefs-preview">
-        
-    </div>
-    <datalist id="class-list" name="class_prefs" multiple>
-        {{#each classes}}
-            <option>{{this}}</option>
-        {{/each}}
-    </datalist>
-    <select id="class-field" name="class_prefs" multiple style="display: none;">
-        {{#each classes}}
-            <option>{{this}}</option>
-        {{/each}}
-    </select>
-    <button type="submit" class="btn btn-primary">Finalize Preferences</button>
-    <p>Or <a href="/">skip</a></p>
-</form>
+<div class="container-fluid d-flex align-items-center flex-column">
+    <h5 class="m-3">Get started by adding classes!</h5>
+    <form id="pref-form" method="POST" action="/register_preferences" class="d-flex align-items-center flex-column">
+        <div class="form-group row">
+            <div class="col-9">
+                <input id="search-class-prefs" type="search" list="class-list" placeholder="Look up a course number" class="form-control"/>
+            </div>
+            <div class="col d-inline">
+                <button onclick="addClassPref()" class="btn btn-secondary mb-2" type="button">Add</button>
+            </div>
+        </div>
+        <div id="class-prefs-preview">
+            
+        </div>
+        <datalist id="class-list" name="class_prefs" multiple>
+            {{#each classes}}
+                <option>{{this}}</option>
+            {{/each}}
+        </datalist>
+        <select id="class-field" name="class_prefs" multiple style="display: none;">
+            {{#each classes}}
+                <option>{{this}}</option>
+            {{/each}}
+        </select>
+
+        <button type="submit" class="btn btn-primary">Finalize Preferences</button>
+        <p class="my-2">Or <a href="/">go to the home page</a></p>
+    </form>
+</div>
 <script>
     document.getElementById('pref-form').reset();
     function addClassPref() {
@@ -56,7 +63,7 @@
                 option.selected = false;
                 button.remove();
             }
-            button.classList.add('btn', 'btn-outline-danger');
+            button.classList.add('btn', 'btn-outline-danger', 'm-2');
             const preview = document.getElementById('class-prefs-preview');
             preview.appendChild(button);
         } else {

@@ -55,11 +55,25 @@ app.get('/', (req, res) => {
 });
 
 app.get('/register', (req, res) => {
-  res.render('pages/register', {not_registered: false, classes: [2400, 2270, 3308, 3104]});
+  db.manyOrNone(
+    'SELECT class_name FROM classes;'
+  )
+    .then(data => {
+      console.log(data);
+      res.render('pages/register', {not_registered: false, classes: [2400, 2270, 3308, 3104]});
+    })
+    .catch(err => {
+      // TODO: show error message
+    });
 });
 
 app.post('/register_preferences', (req, res) => {
-  console.log(req.body);
+  const classes = req.body.class_prefs;
+  if (typeof classes === 'string') {
+    // TODO: use user info to append (user_id, class_id) to users_to_classes
+  } else {
+    // TODO: same as above but iteratively add rows using db.task
+  }
   res.redirect('/');
 });
 
