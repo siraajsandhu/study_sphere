@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS users_to_classes (
   user_id SERIAL PRIMARY KEY NOT NULL,
-  class_id INT NOT NULL,
+  class_id INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users_to_bookmarks (
@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS classes (
 
 CREATE TABLE IF NOT EXISTS classes_to_questions (
   class_id SERIAL PRIMARY KEY NOT NULL,
-  question_id FOREIGN KEY NOT NULL
+  question_id INT NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS questions (
@@ -34,3 +34,8 @@ CREATE TABLE IF NOT EXISTS questions (
   question_name VARCHAR(50) NOT NULL,
   questions_info VARCHAR(150) NOT NULL
 );
+
+ALTER TABLE classes_to_questions
+  ADD CONSTRAINT fk_cq_questions 
+  FOREIGN KEY (question_id)
+  REFERENCES questions(question_id);
