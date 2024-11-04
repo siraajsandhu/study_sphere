@@ -49,6 +49,40 @@ app.use(
   })
 );
 
+// Register API route:
+app.get('/', (req, res) => {
+    res.render('pages/register')
+});
+
+
+app.post('/register', async (req, res) => {
+    //first hash the password given from req
+    const hash = await bcrypt.hash(req.body.password, 10);
+
+
+    var query = 'INSERT INTO users (username, password) VALUES ($1, $2);'
+    const username = req.body.username;
+
+    //run the query to enter the username and password into the database
+    db.none(query, [
+        username,
+        hash,
+    ])
+
+        //redirect to the login page for now if the query is successful
+        //this may to need change to redirect to a classes preference page in the future
+        .then(() => {
+            res.redirect('/login');
+        })
+
+
+        //redirect back to register page if the query was unsuccessful
+        .catch(error => {
+            res.redirect('/register');
+        })
+})
+
+
 // API routes
 app.get('/', (req, res) => {
   // console.log('ASKING FOR HOME');
