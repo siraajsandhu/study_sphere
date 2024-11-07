@@ -14,7 +14,7 @@ Login:
   Negative: 
       The user is not found in the database.
       The User is found but the password does not match.
-      Profile password change:
+Profile password change:
   Positive:
       The password is successfully altered in the database, erasing the old one.
   Negative:
