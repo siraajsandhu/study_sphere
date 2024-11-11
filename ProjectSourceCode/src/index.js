@@ -58,72 +58,108 @@ app.use(
   })
 );
 
+app.use('/resources', express.static(path.join(__dirname, 'resources')));
+
 // Register API route:
 app.get('/register', (req, res) => {
-  res.render('pages/register')
+  res.render('pages/register', {notRegistered: true});
 });
-
 
 app.post('/register', async (req, res) => {
-  //first hash the password given from req
-  const hash = await bcrypt.hash(req.body.password, 10);
+  // check if username and password are valid. if not, tell user that input was invalid
+  const {username, password1, password2} = req.body;
 
+  if (!/^[a-zA-Z]+[a-zA-Z0-9_]*$/.test(username) || 
+      !/^[a-zA-Z0-9_*]*$/.test(password1) ||
+      username.length < 5 || password1.length < 5 ||
+      password1 !== password2) {
+    console.log('ERROR: user entered invalid username and/or password during registration');
+    res.render('pages/register', {
+      error: true,
+      message:
+`<div class='container-fluid'>
+  <p>Invalid username or password, or passwords do not match</p>
+  <p>Usernames and passwords should be at least 5 characters long,
+  consisting of:</p>
+  <ul>
+    <li>lower- and upper-case letters (<kbd>a</kbd>-<kbd>z</kbd>, <kbd>A</kbd>-<kbd>Z</kbd>)</li>
+    <li>digits (<kbd>0</kbd>-<kbd>9</kbd>) (usernames can't start with a digit)</li>
+    <li>underscores (<kbd>_</kbd>) (usernames can't start with an underscore)</li>
+    <li>Passwords may additionally use stars (<kbd>*</kbd>)</li>
+  </ul>
+</div>`,
+      notRegistered: true,
+    });
+    return;
+  }
 
-  var query = 'INSERT INTO users (username, password) VALUES ($1, $2);'
-  const username = req.body.username;
+  // if username and password are valid, register the user and display user preferences.
+  const hash = await bcrypt.hash(req.body.password1, 10);
 
-  //run the query to enter the username and password into the database
-  db.none(query, [
-    username,
-    hash,
-  ])
+  // but check if the user already exists or not
+  db.task(async t => {
+    const existingUser = await t.oneOrNone('SELECT COUNT(*) FROM users WHERE username = $1', [username]);
+    if (Number(existingUser.count) > 0) {
+      res.render('pages/register', {
+        error: true,
+        message: `User with name '${username}' already exists. Please choose another username.`,
+        notRegistered: true,
+      });
+    } else {
+      const {user_id: userId} = await t.one('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *', [username, hash]);
 
-    //redirect to the login page for now if the query is successful
-    //this may to need change to redirect to a classes preference page in the future
-    .then(() => {
-      res.redirect('/login');
-    })
+      // login for user
+      req.session.username = username;
+      req.session.userId = userId;
+      req.session.save();
 
+      const classNames = await t.manyOrNone('SELECT class_name FROM classes');
 
-    //redirect back to register page if the query was unsuccessful
-    .catch(error => {
-      res.redirect('/register');
-    })
-})
-
-/*
-// API routes
-app.get('/', (req, res) => {
-  res.render('pages/home', {});
-});
-
-app.get('/register', (req, res) => {
-  db.manyOrNone(
-    'SELECT class_name FROM classes;'
-  )
-    .then(data => {
-      console.log(data);
-      res.render('pages/register', {not_registered: false, classes: [2400, 2270, 3308, 3104]});
-    })
+      res.render('pages/register', {
+        notRegistered: false,
+        username: req.session.username,
+        classes: classNames.map(row => row.class_name),
+      });
+    }
+  })
     .catch(err => {
-      // TODO: show error message
+      console.log(err);
+      res.render('pages/register', {
+        error: true,
+        message: err.message,
+      });
     });
 });
 
 app.post('/register_preferences', (req, res) => {
   const classes = req.body.class_prefs;
-  if (typeof classes === 'string') {
-    // TODO: use user info to append (user_id, class_id) to users_to_classes
+  const names = [];
+  if (typeof classes === 'string' || typeof classes === 'number') {
+    names.push(`${classes}`);
   } else {
-    // TODO: same as above but iteratively add rows using db.task
+    classes.forEach(name => names.push(name));
+    db.task(async function addPrefs(t) {
+      if (names.length > 0) {
+        const name = names.pop();
+        const query1 = `SELECT class_id FROM classes WHERE class_name = $1 LIMIT 1`;
+        const query2 = `INSERT INTO users_to_classes (user_id, class_id) VALUES ($1, $2) RETURNING *`;
+        const {class_id: classId} = await t.one(query1, [name]);
+        await t.one(query2, [req.session.userId, classId]);
+        
+        console.log(`added class ${name} (${classId}) to user ${req.session.username} (${req.session.userId})`);
+        return addPrefs(t);
+      }
+    })
+      .catch(err => {
+        console.log(err);
+        res.render('pages/profile', {
+          error: true,
+          message: err.message,
+        });
+      });
   }
-  res.redirect('/');
+  res.redirect('/profile');
 });
-
-app.get('/login', (req, res) => {
-  res.render('pages/login');
-});
-*/
 
 //login API route
 app.get('/login', (req, res) => {
@@ -140,9 +176,9 @@ app.post('/login', async (req, res) => {
     if (match) {
       req.session.user = { username: user.username, password: user.password };
       req.session.save(error => {
-        res.redirect('/');
+        res.redirect('/login');
       })
-      res.redirect('/home')
+      res.redirect('/profile')
     } else {
       res.render('pages/login', { message: 'Invalid username or password' })
     }
@@ -161,7 +197,6 @@ app.get('/profile', (req, res) => {
     classname: req.session.classname
   })
 });
-
 
 // start server
 app.listen(3000);
