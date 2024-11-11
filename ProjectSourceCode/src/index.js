@@ -43,12 +43,55 @@ app.set('view engine', 'hbs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(bodyParser.json()); // specify the usage of JSON for parsing request body.
 
+// initialize session variables
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    saveUninitialized: false,
+    resave: false,
+  })
+);
+
 app.use(
   bodyParser.urlencoded({
     extended: true,
   })
 );
 
+// Register API route:
+app.get('/register', (req, res) => {
+  res.render('pages/register')
+});
+
+
+app.post('/register', async (req, res) => {
+  //first hash the password given from req
+  const hash = await bcrypt.hash(req.body.password, 10);
+
+
+  var query = 'INSERT INTO users (username, password) VALUES ($1, $2);'
+  const username = req.body.username;
+
+  //run the query to enter the username and password into the database
+  db.none(query, [
+    username,
+    hash,
+  ])
+
+    //redirect to the login page for now if the query is successful
+    //this may to need change to redirect to a classes preference page in the future
+    .then(() => {
+      res.redirect('/login');
+    })
+
+
+    //redirect back to register page if the query was unsuccessful
+    .catch(error => {
+      res.redirect('/register');
+    })
+})
+
+/*
 // API routes
 app.get('/', (req, res) => {
   res.render('pages/home', {});
@@ -80,6 +123,45 @@ app.post('/register_preferences', (req, res) => {
 app.get('/login', (req, res) => {
   res.render('pages/login');
 });
+*/
+
+//login API route
+app.get('/login', (req, res) => {
+  res.render('pages/login');
+});
+
+app.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+
+    const query = 'SELECT * FROM users WHERE username = $1;';
+    const user = await db.one(query, username);
+    const match = await bcrypt.compare(password, user.password);
+    if (match) {
+      req.session.user = { username: user.username, password: user.password };
+      req.session.save(error => {
+        res.redirect('/');
+      })
+      res.redirect('/home')
+    } else {
+      res.render('pages/login', { message: 'Invalid username or password' })
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+//API route for profile
+app.get('/profile', (req, res) => {
+  res.render('pages/profile', {
+    username: req.session.username,
+    bookmarks: req.session.bookmarks,
+    question: req.session.qestion,
+    classname: req.session.classname
+  })
+});
+
 
 // start server
 app.listen(3000);
