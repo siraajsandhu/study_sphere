@@ -1,18 +1,111 @@
-<link rel="stylesheet" href="../../resources/css/style.css">
-{{> message}}
-<h2>Register</h2>
-<form class="c" method="post" action="/register">    
-    <div class="mb-3">
-        <label for="user" class="form-labelL">Username</label>
-        <input type="username" name="username" placeholder="Xbox"  class="form-control"/>
+<div class="container-fluid d-flex align-items-center flex-column m-3 w-100">
+    <div class="container-fluid d-flex align-items-center flex-column w-25">
+        <h2>
+        {{#if notRegistered}}
+            Join Study Sphere
+        {{else}}
+            Welcome, {{username}}
+        {{/if}}
+        </h2>
+        {{> message}}
+        {{#if notRegistered}}
+            <form class="c" method="POST" action="/register">    
+                <div class="form-group mb-3">
+                    <label for="user" class="form-label">Username</label>
+                    <input type="username" name="username" placeholder="Enter a username" required class="form-control"/>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="pasword" class="form-label">Password</label>
+                    <input type="password" name="password1" placeholder="Enter a password" required class="form-control"/>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="pasword" class="form-label">Confirm password</label>
+                    <input type="password" name="password2" placeholder="Enter a password" required class="form-control"/>
+                </div>
+                <div class="form-group mb-3">
+                    <button type="submit" class="btn w-100 btn-primary form-control">Register</button>
+                </div>
+                <div class="form-group mb-3">
+                    <p class="c">
+                        Already have an account? 
+                        <a href="./login">Login</a>
+                    </p>
+                </div>
+            </form>
+        {{else}}
+            <form id="pref-form" method="POST" action="/register_preferences">
+                <div class="form-group mb-3">
+                    <label class="form-label">Start by picking courses!</label>
+                    <div class="input-group">
+                        <input id="search-class-prefs" type="search" list="class-list" placeholder="Search by course name" class="form-control"/>
+                        <button onclick="addClassPref()" class="btn btn-secondary" type="button" aria-describedby="button-addon2">Add</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">My selection:</label>
+                    <div id="class-prefs-preview" class="prefs mb-3 d-inline-flex flex-wrap"></div>
+                </div>
+
+                {{!-- TODO: insert search partial here --}}
+                <datalist id="class-list" name="class_prefs" multiple>
+                    {{#each classes}}
+                        <option>{{this}}</option>
+                    {{/each}}
+                </datalist>
+                <select id="class-field" name="class_prefs" multiple style="display: none;">
+                    {{#each classes}}
+                        <option>{{this}}</option>
+                    {{/each}}
+                </select>
+
+                <div class="form-group mb-3">
+                    <button type="submit" class="btn w-100 btn-primary form-control">Finalize Preferences</button>
+                </div>
+
+                <div class="form-group mb-3 w-100 d-flex align-items-center">
+                    <p>Or <a href="/">go to the home page</a></p>
+                </div>
+            </form>
+            <script>
+                document.getElementById('pref-form').reset();
+                function addClassPref() {
+                    const searchBar = document.getElementById('search-class-prefs');
+                    const key = searchBar.value;
+                    const select = document.getElementById('class-field');
+                    const options = [...select.options];
+                    const option = options.find(o => o.value === key);
+                    if (option && !option.selected) {
+                        option.selected = true;
+                        const button = document.createElement('button');
+                        button.innerHTML = 
+        `${option.value} <svg fill="#000000" width="15px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+            viewBox="0 0 310.285 310.285" xml:space="preserve">
+        <path d="M155.143,0.001C69.597,0.001,0,69.597,0,155.143c0,85.545,69.597,155.142,155.143,155.142s155.143-69.597,155.143-155.142
+            C310.285,69.597,240.689,0.001,155.143,0.001z M244.143,171.498c0,4.411-3.589,8-8,8h-163c-4.411,0-8-3.589-8-8v-32
+            c0-4.411,3.589-8,8-8h163c4.411,0,8,3.589,8,8V171.498z"/>
+        </svg>`;
+                        button.onclick = () => {
+                            option.selected = false;
+                            button.remove();
+                        }
+                        button.classList.add('btn', 'btn-secondary', 'me-2', 'mb-2');
+                        const preview = document.getElementById('class-prefs-preview');
+                        preview.appendChild(button);
+                        message.style.display = 'none';
+                    } else if (option?.selected) {
+                        console.error(`option '${key}' is already selected`);
+                        const message = document.getElementById('message');
+                        message.textContent = `Course '${option.value}' is already selected.`;
+                        message.style.display = '';
+                    } else {
+                        console.error(`option '${key}' does not exist`);
+                        const message = document.getElementById('message');
+                        message.textContent = `Course '${key}' does not exist.`;
+                        message.style.display = '';
+                    }
+                }
+            </script>
+        {{/if}}
     </div>
-    <div class="mb-3">
-        <label for="pasword" class="form-labelL">Password</label>
-        <input type="password" name="password" placeholder="Good Strong Password"  class="form-control"/>
-    </div>
-    <button type="submit" class="btn btn-solo">Register</button>
-</form>
-<p class="c">
-    Already have an account? 
-    <a href="./login">Login</a>
-</p> 
+</div>

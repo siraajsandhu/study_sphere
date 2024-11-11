@@ -1,11 +1,11 @@
 CREATE TABLE IF NOT EXISTS users (
   user_id SERIAL PRIMARY KEY NOT NULL,
-  username CHAR(15) NOT NULL,
-  password CHAR(15) NOT NULL
+  username VARCHAR(15) NOT NULL,
+  password CHAR(60) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users_to_classes (
-  user_id SERIAL PRIMARY KEY NOT NULL,
+  user_id INT NOT NULL,
   class_id INT NOT NULL
 );
 
