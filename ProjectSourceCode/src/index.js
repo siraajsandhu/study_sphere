@@ -62,16 +62,13 @@ app.get('/', (req, res) => {
 
 
 app.get('/courses', (req, res) => {
-    const taken = req.query.taken;
-    // Query to list all the courses taken by a student
-  
-    db.any(taken ? student_courses : all_courses, [req.session.user.student_id])
+    const questionQ = 'SELECT name FROM trails WHERE location = \'California\' ORDER BY avg_rating DESC LIMIT 3 ';
+    db.any(taken ? questions : all_courses, [req.session.user.student_id])
       .then(courses => {
         console.log(courses)
-        res.render('pages/courses', {
+        res.render('src/views/pages/courses', {
           email: user.email,
           courses,
-          action: req.query.taken ? 'delete' : 'add',
         });
       })
       .catch(err => {
