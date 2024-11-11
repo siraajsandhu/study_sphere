@@ -60,6 +60,30 @@ app.get('/', (req, res) => {
   // res.redirect('/login');
 });
 
+
+app.get('/courses', (req, res) => {
+    const taken = req.query.taken;
+    // Query to list all the courses taken by a student
+  
+    db.any(taken ? student_courses : all_courses, [req.session.user.student_id])
+      .then(courses => {
+        console.log(courses)
+        res.render('pages/courses', {
+          email: user.email,
+          courses,
+          action: req.query.taken ? 'delete' : 'add',
+        });
+      })
+      .catch(err => {
+        res.render('pages/courses', {
+          courses: [],
+          email: user.email,
+          error: true,
+          message: err.message,
+        });
+      });
+});
+
 // start server
 app.listen(3000);
 console.log('Server listening on port 3000');
