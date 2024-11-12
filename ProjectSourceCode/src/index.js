@@ -62,8 +62,8 @@ app.get('/', (req, res) => {
 
 
 app.get('/courses', (req, res) => {
-    const questionQ = 'SELECT name FROM trails WHERE location = \'California\' ORDER BY avg_rating DESC LIMIT 3 ';
-    db.any(taken ? questions : all_courses, [req.session.user.student_id])
+    const questionQ = 'SELECT questions_name FROM questions INNER JOIN classes_to_questions ON questions_id = classes_to_questions.questions_id  INNER JOIN classes ON classes_to_qustions.class_id = class_id GROUP BY questions_name';
+    db.any(questionQ, [req.session.user.student_id])
       .then(courses => {
         console.log(courses)
         res.render('src/views/pages/courses', {
