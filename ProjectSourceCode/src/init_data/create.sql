@@ -21,7 +21,8 @@ CREATE TABLE IF NOT EXISTS users_to_asked_questions (
 
 CREATE TABLE IF NOT EXISTS classes (
   class_id SERIAL PRIMARY KEY NOT NULL,
-  class_name VARCHAR(50) NOT NULL
+  class_name VARCHAR(50) NOT NULL,
+  class_desc VARCHAR(150) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS classes_to_questions (

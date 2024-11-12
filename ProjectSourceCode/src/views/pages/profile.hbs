@@ -1,40 +1,75 @@
-<link rel="stylesheet" href="../../resources/css/style.css">
-<h1>{{username}}</h1>
+<div class="container-fluid d-flex flex-column w-100 p-4">
+    <h1>Welcome, {{username}}</h1>
+    <div class="container-fluid row ps-4">
+        <div class="col-lg-9">
+            <h4>My bookmarks</h4>
+            {{> search}}
+            <div class="container-fluid mb-3">
+                <table class="saved">
+                    {{#each bookmarks}}
+                        <tr>
+                            <th>{{question}}</th>
+                            <th>{{answer}}</th>
+                            <th>
+                                <form action="/profile" method="delete">
+                                    <input type="hidden" name="bookmark_id" value="{{id}}">
+                                    <input type="submit" value="remove">
+                                </form>
+                            </th>
+                        </tr>
+                    {{/each}}
+                </table>
+            </div>
 
-<p>My Bookmarks</p>
+            <h4>My classes</h4>
+            {{!-- cards for user classes --}}
+            <div class="container-fluid saved mb-3">
+                <div class="row">
+                    {{#each classes}}
+                        <div class="col-sm-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <a href="#">
+                                        <h5 class="card-title">{{this.class_name}}</h5>
+                                    </a>
+                                    <p class="card-text">{{this.class_desc}}</p>
+                                    
+                                </div>
+                                <div class="card-footer">
+                                    <form action="profile_class", method="DELETE">
+                                        <input type="hidden" value="{{this.class_id}}" name="classId"/>
+                                        <input type="submit" class="btn btn-outline-danger" value="Remove class"/>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    {{/each}}
+                </div>
+            </div>
+        </div>
 
-{{> search}}
-
-{{!-- table for user bookmarks --}}
-<table>
-    {{#each bookmarks}}
-        <tr>
-            <th>{{question}}</th>
-            <th>{{answer}}</th>
-            <th>
-                <form action="/profile" method="delete">
-                    <input type="hidden" name="bookmark_id" value="{{id}}">
-                    <input type="submit" value="remove">
-                </form>
-            </th>
-        </tr>
-    {{/each}}
-</table>
-
-<p>My classes</p>
-
-{{!-- cards for user classes --}}
-<div class="container mt-4">
-    <div class="row">
-    {{#each classes}}
-    <div class="card">{{classname}}</div>
-    {{/each}}
+        {{!-- form for changing username or password --}}
+        {{!-- how should it be? chaging it immediately or redirect it? --}}
+        <div class="col">
+            <h4>Change password</h4>
+            {{> message}}
+            <form action="/profile" method="POST" class="w-100">
+                <div class="form-group mb-3">
+                    <label for="pasword" class="form-label">Old password</label>
+                    <input type="password" name="oldPwd" placeholder="Enter old password" required class="form-control"/>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="pasword" class="form-label">New password</label>
+                    <input type="password" name="newPwd1" placeholder="Enter a password" required class="form-control"/>
+                </div>
+                <div class="form-group mb-3">
+                    <label for="pasword" class="form-label">Confirm new password</label>
+                    <input type="password" name="newPwd2" placeholder="Enter a password" required class="form-control"/>
+                </div>
+                <div class="form-group mb-3">
+                    <button type="submit" class="btn w-100 btn-primary form-control">Change password</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
-
-{{!-- form for changing username or password --}}
-{{!-- how should it be? chaging it immediately or redirect it? --}}
-<form action="/change_username_password" method="post">
-    <input name="new_val" class="form-control" id="newone" placeholder="change username/password">
-    <button type="submit">change</button>
-</form>
