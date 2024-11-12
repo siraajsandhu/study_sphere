@@ -1,6 +1,6 @@
-INSERT INTO classes (class_name)
+INSERT INTO classes (class_name, class_desc)
 VALUES
-('CSCI2270'),
-('CSCI2400'),
-('CSCI3308'),
-('CSCI3104');
+('CSCI2270', 'Data Structures'),
+('CSCI2400', 'Computer Systems'),
+('CSCI3308', 'Software Development Methods & Tools'),
+('CSCI3104', 'Algorithms');
