@@ -91,7 +91,6 @@ app.post('/register', async (req, res) => {
     })
 })
 
-/*
 // API routes
 app.get('/', (req, res) => {
   // console.log('ASKING FOR HOME');
@@ -102,7 +101,6 @@ app.get('/', (req, res) => {
   res.render('pages/home', {});
   // res.redirect('/login');
 });
-*/
 
 //login API route
 app.get('/login', (req, res) => {
@@ -141,6 +139,46 @@ app.get('/profile', (req, res) => {
   })
 });
 
+//Search Route
+app.get('/search',(req, res) => {
+  const userSearch=req.query.search;
+  const query = 'SELECT class AS source, from classes where class_name=$1 UNION SELECT question AS source, from questions where question_name=$1 UNION SELECT user AS source from users where username=$1';
+  db.task(query,userSearch)
+    .then(()=> {
+
+      if (source=='class') {
+        
+      }
+
+      else if (source =='question'){
+
+      }
+
+      else if (source =='user') {
+
+      }
+
+    }) 
+
+    .catch (err => {
+      console.log ("No Results Found");
+    }
+    )
+})
+
+//create class route
+
+app.get('/createClass',(req,res) => {
+  const class_name = req.session.class;
+  const query="SELECT * from classes WHERE class_name=$1";
+  db.task(query,class_name)
+    if (query!=NULL){
+      res.session="INSERT into classes (class_name) VALUES ($1)";
+      /* testing query */
+      console.log("successfully added into table");
+    }
+  document.getElementById("class_name")="";
+});
 
 // start server
 app.listen(3000);

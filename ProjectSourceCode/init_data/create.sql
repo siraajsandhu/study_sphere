@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS users_to_asked_questions (
 );
 
 CREATE TABLE IF NOT EXISTS classes (
-  class_id SERIAL PRIMARY KEY NOT NULL,
+  class_id SERIAL PRIMARY KEY NOT NULL AUTO_INCREMENT,
   class_name VARCHAR(50) NOT NULL
 );
 
