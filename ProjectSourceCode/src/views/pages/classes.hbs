@@ -1,26 +1,148 @@
+{{> message}}
+
+{{!-- search bar --}}
+<div class="container mt-4">
+  <h3>Search Questions</h3>
+  <div class="search-bar position-relative">
+    <input type="text" class="form-control" id="search_query" name="search_query" placeholder="Search for questions..."
+      onkeyup="fetchSuggestions()">
+    <div class="suggestions-list position-absolute w-100 bg-white border" id="suggestions-list" style="display: none;">
+    </div>
+    <button type="button" class="btn btn-secondary mt-2" onclick="searchQuestions()">Search</button>
+  </div>
+</div>
+
+<script>
+  function searchQuestions() {
+    const query = document.getElementById('search_query').value;
+    if (query) {
+      window.location.href = `/search?query=${encodeURIComponent(query)}`;
+    }
+  }
+
+  async function fetchSuggestions() {
+    const query = document.getElementById('search_query').value.trim();
+    if (query.length > 0) {
+      try {
+        const response = await fetch(`/api/suggestions?query=${encodeURIComponent(query)}`);
+        if (response.ok) {
+          const suggestions = await response.json();
+          displaySuggestions(suggestions);
+        }
+      } catch (error) {
+        console.error('Error fetching suggestions:', error);
+      }
+    } else {
+      document.getElementById('suggestions-list').style.display = 'none';
+    }
+  }
+
+  function displaySuggestions(suggestions) {
+    const suggestionsList = document.getElementById('suggestions-list');
+    suggestionsList.innerHTML = '';
+
+    if (suggestions.length > 0) {
+      suggestions.forEach(suggestion => {
+        const suggestionItem = document.createElement('div');
+        suggestionItem.className = 'suggestion-item p-2 border-bottom';
+        suggestionItem.textContent = suggestion;
+        suggestionItem.onclick = function () {
+          document.getElementById('search_query').value = suggestion;
+          suggestionsList.style.display = 'none';
+        };
+        suggestionsList.appendChild(suggestionItem);
+      });
+      suggestionsList.style.display = 'block';
+    } else {
+      suggestionsList.style.display = 'none';
+    }
+  }
+</script>
+
+
 {{!-- posting question --}}
-<div class="container">
+<div class="container mt-4">
   <h2>post new question</h2>
-
-  {{> message}}
-
   <form action="/new_question" method="POST">
     <div class="form-group">
       {{!--<label for="question_title">title</label>--}}
-      <input type="text" class="form-control" id="question_title" name="question_title" value="{{question_title}}" placeholder="title" required>
+      <input type="text" class="form-control" id="question_title" name="question_title" value="{{question_title}}"
+        placeholder="title" required>
     </div>
     <div class="form-group">
       {{!--<label for="questions_content">the content</label>--}}
-      <textarea class="form-control" id="questions_content" name="questions_content" rows="5" placeholder="the question is about ..."  required>{{questions_info}}</textarea>
+      <textarea class="form-control" id="questions_content" name="questions_content" rows="5"
+        placeholder="the question is about ..." required>{{questions_info}}</textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">My selection:</label>
+      <div id="class-prefs-preview" class="prefs mb-3 d-inline-flex flex-wrap"></div>
     </div>
     <div class="form-group">
       <label for="class_prefs">class</label>
-      <select multiple class="form-control" id="class_prefs" name="class_prefs">
+      <datalist id="class-list" name="class_prefs" multiple>
         {{#each classes}}
-          <option value="{{this}}" {{#if (isSelected this ../selected_classes)}}selected{{/if}}>{{this}}</option>
+        <option>{{this}}</option>
+        {{/each}}
+      </datalist>
+      <select id="class-field" name="class_prefs" multiple style="display: none;">
+        {{#each classes}}
+        <option>{{this}}</option>
         {{/each}}
       </select>
     </div>
     <button type="submit" class="btn btn-primary">post this question</button>
   </form>
+  <script>
+    document.getElementById('pref-form').reset();
+    function addClassPref() {
+      const searchBar = document.getElementById('search-class-prefs');
+      const key = searchBar.value;
+      const select = document.getElementById('class-field');
+      const options = [...select.options];
+      const option = options.find(o => o.value === key);
+      if (option && !option.selected) {
+        option.selected = true;
+        const button = document.createElement('button');
+        button.innerHTML =
+          `${option.value} <svg fill="#000000" width="15px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" 
+            viewBox="0 0 310.285 310.285" xml:space="preserve">
+        <path d="M155.143,0.001C69.597,0.001,0,69.597,0,155.143c0,85.545,69.597,155.142,155.143,155.142s155.143-69.597,155.143-155.142
+            C310.285,69.597,240.689,0.001,155.143,0.001z M244.143,171.498c0,4.411-3.589,8-8,8h-163c-4.411,0-8-3.589-8-8v-32
+            c0-4.411,3.589-8,8-8h163c4.411,0,8,3.589,8,8V171.498z"/>
+        </svg>`;
+        button.onclick = () => {
+          option.selected = false;
+          button.remove();
+        }
+        button.classList.add('btn', 'btn-secondary', 'me-2', 'mb-2');
+        const preview = document.getElementById('class-prefs-preview');
+        preview.appendChild(button);
+        message.style.display = 'none';
+      } else if (option?.selected) {
+        console.error(`option '${key}' is already selected`);
+        const message = document.getElementById('message');
+        message.textContent = `Course '${option.value}' is already selected.`;
+        message.style.display = '';
+      } else {
+        console.error(`option '${key}' does not exist`);
+        const message = document.getElementById('message');
+        message.textContent = `Course '${key}' does not exist.`;
+        message.style.display = '';
+      }
+    }
+  </script>
+
+  {{!--popular question --}}
+  <div class="container">
+    <h3>Popular Questions</h3>
+    <div class="popular-questions">
+      <ul>
+        {{#each popular_questions}}
+        <li><a href="/question/{{this.id}}">{{this.title}}</a></li>
+        {{/each}}
+      </ul>
+    </div>
+  </div>
+
 </div>
