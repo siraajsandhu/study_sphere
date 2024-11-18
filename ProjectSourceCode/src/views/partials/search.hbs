@@ -1,8 +1,64 @@
-<div class="topnav">
-  <div class="search-container">
-    <form action="/search" method="GET">
-      <input type="text" placeholder="Search.." name="search" required>
-      <button type="submit">Search</button>
+<div id="search-container" class="container-fluid m-0 p-0">
+    <form id="search-meta">
+      <input type="hidden" name="table" value="{{searchMeta.table}}">
+      <input type="hidden" name="field" value="{{searchMeta.field}}">
     </form>
-  </div>
-</div> 
+    <label class="form-label">{{searchMeta.title}}</label>
+    <div class="input-group">
+      <div class="input-group" id="search-input-container">
+        <input id="search-key-input" list="class-list" placeholder="Search by course name" class="form-control"/>
+        <button onclick="search()" class="btn btn-secondary" id="search-btn" type="button" aria-describedby="button-addon2">Search</button>
+      </div>
+      <div id="search-table-container" style="display: none;">
+        <table class="table table-sm table-bordered m-0 p-0" id="search-table">
+          <tbody id="search-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <script>
+      const resTableCont = document.getElementById('search-table-container');
+      const resTable = document.getElementById('search-table-body');
+      const keyInput = document.getElementById('search-key-input');
+      const searchMetaForm = document.getElementById('search-meta');
+      const searchParams = Object.fromEntries(new FormData(searchMetaForm));
+
+      document.addEventListener('click', () => {
+        resTableCont.style.display = 'none';
+      });
+      
+      resTableCont.addEventListener('click', e => {
+        e.stopPropagation();
+      });
+
+      keyInput.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          search();
+        }
+      });
+
+      async function search() {
+        const key = keyInput.value;
+        const results = await fetch(
+          `/search_util?table=${searchParams.table}&field=${searchParams.field}&searchKey=${key}`);
+        const json = await results.json();
+
+        resTable.innerHTML = '';
+        for (result of json.results) {
+          const row = document.createElement('tr');
+          row.appendChild(handleResult(result));
+          resTable.appendChild(row);
+        }
+
+        if (json.results.length === 0) {
+          const row = document.createElement('tr');
+          const msg = document.createElement('td');
+          msg.textContent = 'nothing found';
+          row.appendChild(msg);
+          row.classList.add('search-empty');
+          resTable.appendChild(row);
+        }
+
+        resTableCont.style.display = '';
+      }
+    </script>
+</div>

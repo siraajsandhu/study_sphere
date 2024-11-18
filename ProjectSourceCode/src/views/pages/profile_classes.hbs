@@ -1,0 +1,42 @@
+<div class="container-fluid d-flex flex-column w-100 p-4">
+    <h1>Welcome, {{user.username}}</h1>
+    <ul class="nav nav-tabs mt-2">
+        <li class="nav-item">
+            <a class="nav-link" href="/profile/update">Update Profile</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="#">Classes</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/profile/bookmarks">Bookmarked Questions</a>
+        </li>
+    </ul>
+    <div class="container-fluid w-50 mt-3">
+        <h2>My Classes</h2>
+        {{> message}}
+        {{!-- cards for user classes --}}
+        <div class="container-fluid saved mb-3">
+            <div class="row row-cols-2">
+                {{#each classes}}
+                    <div class="col mb-2 p-0 pe-2">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <a href="#">
+                                    <h5 class="card-title">{{this.class_name}}</h5>
+                                </a>
+                                <p class="card-text">{{this.class_desc}}</p>
+                            </div>
+                            <div class="card-footer">
+                                <form action="/profile/classes", method="POST">
+                                    <input type="hidden" value="{{this.class_name}}" name="className"/>
+                                    <input type="hidden" value="{{this.class_id}}" name="classId"/>
+                                    <input type="submit" class="btn btn-outline-danger" value="Remove class"/>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
+            </div>
+    </div>
+</div>
