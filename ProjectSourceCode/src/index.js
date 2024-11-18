@@ -232,7 +232,7 @@ app.post('/login', async (req, res) => {
     if (match) {
       req.session.loggedIn = true;
       req.session.user = {
-        userId: user.userId,
+        userId: user.user_id,
         username: user.username,
       };
       
@@ -321,21 +321,45 @@ app.post('/profile/update', async (req, res) => {
 
 app.get('/profile/classes', async (req, res) => {
   try {
+    const { username, userId } = req.session.user;
+    const classes = await db.any(
+`SELECT c.class_name, c.class_desc, c.class_id 
+FROM users_to_classes uc 
+INNER JOIN classes c ON uc.class_id=c.class_id 
+WHERE uc.user_id = $1`, 
+      [userId]);
 
+    console.log(classes);
+
+    const params = {
+      user: req.session.user,
+      classes,
+    };
+
+    if (req.query.removed) {
+      params.message = messages.profile_deletedClass(req.query.removed);
+    }
+
+    return res.render('pages/profile_classes', params);
   } catch(err) {
-    genericFail('pages/profile', res, err);
+    genericFail('pages/profile_update', res, err);
   }
 });
 
+app.post('/profile/classes', async (req, res) => {
+  try {
+    const { username, userId } = req.session.user;
+    const classId = req.body.classId;
+    
+    await db.any('DELETE FROM users_to_classes WHERE (user_id=$1 AND class_id=$2)', [userId, classId]);
 
-
-//TODO
-// const data = await db.any('SELECT c.class_name, c.class_desc FROM users_to_classes uc INNER JOIN classes c ON uc.class_id=c.class_id WHERE uc.user_id = $1', [userId]);
-// const classes = await t.any('SELECT c.class_name, c.class_desc FROM users_to_classes uc INNER JOIN classes c ON uc.class_id=c.class_id WHERE uc.user_id = $1', [req.session.userId]);
-// const bookmarks = await t.any('SELECT question_id FROM ');
-// console.log(classes);
-
-// return { classes };
+    return res.redirect(
+      `/profile/classes?removed=${req.body.className}`,
+    );
+  } catch(err) {
+    genericFail('pages/profile_classes', res, err);
+  }
+});
 
 /**
  * CLASSES API ROUTE(S)

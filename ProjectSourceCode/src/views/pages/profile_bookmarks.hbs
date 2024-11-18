@@ -1,0 +1,25 @@
+
+
+    {{!-- <div class="container-fluid row ps-4">
+        <div class="col-lg-9">
+            <h4>My bookmarks</h4>
+            {{> search}}
+            <div class="container-fluid mb-3">
+                <table class="saved">
+                    {{#each bookmarks}}
+                        <tr>
+                            <th>{{question}}</th>
+                            <th>{{answer}}</th>
+                            <th>
+                                <form action="/profile" method="delete">
+                                    <input type="hidden" name="bookmark_id" value="{{id}}">
+                                    <input type="submit" value="remove">
+                                </form>
+                            </th>
+                        </tr>
+                    {{/each}}
+                </table>
+            </div>
+
+            
+        </div>

@@ -32,4 +32,6 @@
 </div>`;
 
   module.exports.profile_pwdUpdateSuccess = () => `Profile updated successfully`;
+
+  module.exports.profile_deletedClass = name => `Removed class '${name}'`;
 }());
