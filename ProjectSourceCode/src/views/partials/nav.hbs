@@ -17,11 +17,8 @@
                     <a class="dropdown-item" href="/profile">Profile</a>
                     <!-- username may be subject to change, This just checks if the user is logged in then give them logout
                         and if user is not logged in then give them the login option -->
-                    {{#if username}}
-                        <a class="dropdown-item" href="/logout">Logout</a>
-                    {{else}}
-                        <a class="dropdown-item" href="/login">Login</a>
-                    {{/if}}
+                    <a class="dropdown-item" href="/login">Login</a>
+                    <a class="dropdown-item" href="/logout">Logout</a>
                     <a class="dropdown-item" href="/register">Register</a>
                 </div>
             </li>

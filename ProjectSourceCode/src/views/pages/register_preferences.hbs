@@ -1,0 +1,74 @@
+<div class="container-fluid d-flex align-items-center flex-column m-3 w-100">
+    <div class="container-fluid d-flex align-items-center flex-column w-25">
+        <h2>
+        Welcome, {{username}}
+        </h2>
+        {{> message}}
+        {{> search}}
+        <form id="pref-form" method="POST" action="/register/preferences" style="width: 100%;" class="mt-3">
+            <div class="form-group">
+                <label class="form-label">My selection:</label>
+                <div id="class-prefs-preview" class="prefs mb-3 d-inline-flex flex-wrap"></div>
+            </div>
+            <select id="class-field" name="class_prefs" multiple style="display: none;"></select>
+            <div class="form-group mb-3">
+                <button type="submit" class="btn w-100 btn-primary form-control">Finalize Preferences</button>
+            </div>
+            <div class="form-group mb-3 w-100 d-flex align-items-center">
+                <p>Or <a href="/">go to the home page</a></p>
+            </div>
+        </form>
+        <script>
+            document.getElementById('pref-form').reset();
+
+            function handleResult(result) {
+                const td = document.createElement('td');
+                const a = document.createElement('a');
+                a.href = '#';
+                a.textContent = result.class_name;
+                a.onclick = () => addClassPref(result.class_name);
+                td.appendChild(a);
+                return td;
+            }
+
+            function addClassPref(name) {
+                const message = document.getElementById('message');
+                const preview = document.getElementById('class-prefs-preview');
+                const select = document.getElementById('class-field');
+                const options = [...select.options];
+
+                let option = options.find(o => o.value === name);
+                console.log('found', option);
+                
+                if (option) {
+                    message.style.display = '';
+                    message.textContent = `Course '${name}' is already selected.`;
+                } else {
+                    message.style.display = 'none';
+                    
+                    const option = document.createElement('option');
+                    const button = document.createElement('button');
+
+                    option.value = name;
+                    option.selected = true;
+                    button.innerHTML = 
+`${name} <svg fill="#000000" width="15px" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 310.285 310.285" xml:space="preserve">
+    <path d="M155.143,0.001C69.597,0.001,0,69.597,0,155.143c0,85.545,69.597,155.142,155.143,155.142s155.143-69.597,155.143-155.142
+        C310.285,69.597,240.689,0.001,155.143,0.001z M244.143,171.498c0,4.411-3.589,8-8,8h-163c-4.411,0-8-3.589-8-8v-32
+        c0-4.411,3.589-8,8-8h163c4.411,0,8,3.589,8,8V171.498z"/>
+</svg>`;
+                    button.classList.add('btn', 'btn-secondary', 'me-2', 'mb-2');
+                    button.onclick = () => {
+                        option.remove();
+                        button.remove();
+                    }
+
+                    select.appendChild(option);
+                    preview.appendChild(button);
+                }
+
+                document.getElementById('search-table-container').style.display = 'none';
+            }
+        </script>
+    </div>
+</div>
