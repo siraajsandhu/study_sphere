@@ -60,7 +60,24 @@ app.use(
 
 app.use('/resources', express.static(path.join(__dirname, 'resources')));
 
-// Register API route:
+// API ROUTES.
+// -------------------------------------  ROUTES for home.hbs   ----------------------------------------------
+app.get('/', (req, res) => {
+  res.render('pages/home');
+});
+
+/*
+app.get('/home', (req, res) => {
+    var query = 'SELECT * FROM classes'
+    db.any(query)
+    .then( data => {
+
+    })
+}); 
+*/
+
+
+// -------------------------------------  ROUTES for register.hbs   ----------------------------------------------
 app.get('/register', (req, res) => {
   res.render('pages/register', { notRegistered: true });
 });
@@ -131,6 +148,7 @@ app.post('/register', async (req, res) => {
     });
 });
 
+
 app.post('/register_preferences', (req, res) => {
   const classes = req.body.class_prefs;
   const names = [];
@@ -161,7 +179,9 @@ app.post('/register_preferences', (req, res) => {
   res.redirect('/profile');
 });
 
-//login API route
+
+// -------------------------------------  ROUTES for login.hbs   ----------------------------------------------
+
 app.get('/login', (req, res) => {
   res.render('pages/login');
 });
@@ -188,7 +208,7 @@ app.post('/login', async (req, res) => {
   }
 });
 
-//API route for profile
+// -------------------------------------  ROUTES for profile.hbs   ----------------------------------------------
 app.get('/profile', async (req, res) => {
   // console.log('test', req.session.username);
   // return;
@@ -299,25 +319,25 @@ app.post('/profile', async (req, res) => {
 //   }
 // });
 
+// -------------------------------------  ROUTES for courses.hbs and classes.hbs  ----------------------------------------------
+
 app.get('/classes' ,(req,res)=>{
   res.render('pages/classes')
 });
 
 
 app.get('/courses', (req, res) => {
-    const questionQ = 'SELECT questions_name FROM questions INNER JOIN classes_to_questions ON questions_id = classes_to_questions.questions_id  INNER JOIN classes ON classes_to_qustions.class_id = class_id GROUP BY questions_name';
-    db.any(questionQ, [req.session.user.student_id])
-      .then(courses => {
-        console.log(courses)
+    const questionQ = 'SELECT question_name, question_id FROM questions INNER JOIN classes_to_questions ON question_id = classes_to_questions.question_id  INNER JOIN classes ON classes_to_questions.class_id = class_id GROUP BY question_name';
+    db.any(questionQ, [req.session.user])
+      .then(questions => {
+        console.log(questions)
         res.render('src/views/pages/courses', {
-          email: user.email,
-          courses,
+          questions,
         });
       })
       .catch(err => {
         res.render('pages/courses', {
-          courses: [],
-          email: user.email,
+          questions: [],
           error: true,
           message: err.message,
         });
