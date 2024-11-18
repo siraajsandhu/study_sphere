@@ -111,6 +111,13 @@ app.get('/search_util', (req, res) => {
 });
 
 /**
+ * HOME API ROUTE(S)
+ */
+app.get('/', (req, res) => {
+  res.render('pages/home');
+});
+
+/**
  * REGISTER API ROUTE(S)
  */
 app.get('/register', (req, res) => {
@@ -366,6 +373,24 @@ app.post('/profile/classes', async (req, res) => {
  */
 app.get('/classes' ,(req,res)=>{
   res.render('pages/classes')
+});
+
+app.get('/courses', (req, res) => {
+  const questionQ = 'SELECT question_name, question_id FROM questions INNER JOIN classes_to_questions ON question_id = classes_to_questions.question_id  INNER JOIN classes ON classes_to_questions.class_id = class_id GROUP BY question_name';
+  db.any(questionQ, [req.session.user])
+    .then(questions => {
+      console.log(questions)
+      res.render('src/views/pages/courses', {
+        questions,
+      });
+    })
+    .catch(err => {
+      res.render('pages/courses', {
+        questions: [],
+        error: true,
+        message: err.message,
+      });
+      });
 });
 
 /**
