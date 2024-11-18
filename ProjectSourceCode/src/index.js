@@ -371,7 +371,7 @@ app.post('/profile/classes', async (req, res) => {
 /**
  * CLASSES API ROUTE(S)
  */
-app.get('/classes' ,(req,res)=>{
+app.get('/classes', (req, res) => {
   res.render('pages/classes')
 });
 
@@ -391,6 +391,19 @@ app.get('/courses', (req, res) => {
         message: err.message,
       });
       });
+});
+
+/**
+ * LOGOUT API ROUTE(S)
+ */
+app.get('/logout', (req, res) => {
+  if (req.session.user) {
+    const oldUser = req.session.user.username;
+    req.session.destroy();
+    res.render('pages/logout', {oldUser});
+  } else {
+    res.redirect('/login');
+  }
 });
 
 /**
