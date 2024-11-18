@@ -62,22 +62,22 @@ app.use('/resources', express.static(path.join(__dirname, 'resources')));
 
 // Register API route:
 app.get('/register', (req, res) => {
-  res.render('pages/register', {notRegistered: true});
+  res.render('pages/register', { notRegistered: true });
 });
 
 app.post('/register', async (req, res) => {
   // check if username and password are valid. if not, tell user that input was invalid
-  const {username, password1, password2} = req.body;
+  const { username, password1, password2 } = req.body;
 
-  if (!/^[a-zA-Z]+[a-zA-Z0-9_]*$/.test(username) || 
-      !/^[a-zA-Z0-9_*]*$/.test(password1) ||
-      username.length < 5 || password1.length < 5 ||
-      password1 !== password2) {
+  if (!/^[a-zA-Z]+[a-zA-Z0-9_]*$/.test(username) ||
+    !/^[a-zA-Z0-9_*]*$/.test(password1) ||
+    username.length < 5 || password1.length < 5 ||
+    password1 !== password2) {
     console.log('ERROR: user entered invalid username and/or password during registration');
     res.render('pages/register', {
       error: true,
       message:
-`<div class='container-fluid'>
+        `<div class='container-fluid'>
   <p>Invalid username or password, or passwords do not match</p>
   <p>Usernames and passwords should be at least 5 characters long,
   consisting of:</p>
@@ -106,7 +106,7 @@ app.post('/register', async (req, res) => {
         notRegistered: true,
       });
     } else {
-      const {user_id: userId} = await t.one('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *', [username, hash]);
+      const { user_id: userId } = await t.one('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *', [username, hash]);
 
       // login for user
       req.session.username = username;
@@ -143,9 +143,9 @@ app.post('/register_preferences', (req, res) => {
         const name = names.pop();
         const query1 = `SELECT class_id FROM classes WHERE class_name = $1 LIMIT 1`;
         const query2 = `INSERT INTO users_to_classes (user_id, class_id) VALUES ($1, $2) RETURNING *`;
-        const {class_id: classId} = await t.one(query1, [name]);
+        const { class_id: classId } = await t.one(query1, [name]);
         await t.one(query2, [req.session.userId, classId]);
-        
+
         console.log(`added class ${name} (${classId}) to user ${req.session.username} (${req.session.userId})`);
         return addPrefs(t);
       }
@@ -197,6 +197,50 @@ app.get('/profile', (req, res) => {
     classname: req.session.classname
   })
 });
+
+//API route to render questions page
+app.get('/question', (req, res) => {
+  res.render('pages/question');
+});
+
+//bookmark to question API route
+app.post('/bookmark_question', async (req, res) => {
+  if(req.session.username) {
+    const is_bookmarked = await db.one('SELECT FROM users_to_bookmarks WHERE user_id = $1 AND question_id = $2;', [req.session.userId, req.body.id]);
+
+    if (is_bookmarked === NULL) {
+      const userId = req.session.userId;
+      const questionId = req.body.id;
+      const query = 'INSERT INTO users_to_bookmarks (user_id, question_id) VALUES ($1, $2);';
+
+      db.none(query, [
+        userId,
+        questionId,
+      ])
+
+      res.render('/pages/question', {
+        bookmarked: true,
+      });
+    }
+    else{
+      const userId = req.session.userId;
+      const questionId = req.body.id;
+      const query2 = 'DELETE FROM users_to_bookmarks WHERE user_id = $1 AND question_id = $2;';
+
+      db.none(query2, [
+        userId,
+        questionId,
+      ]);
+
+      res.render('/pages/question', {
+        bookmarked: false,
+      });
+    }
+  }
+  else{
+    res.redirect('/login');
+  }
+})
 
 // start server
 app.listen(3000);
