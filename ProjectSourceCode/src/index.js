@@ -121,11 +121,16 @@ app.get('/', (req, res) => {
  * REGISTER API ROUTE(S)
  */
 app.get('/register', (req, res) => {
+<<<<<<< HEAD
   res.render('pages/register');
+=======
+  res.render('pages/register', { notRegistered: true });
+>>>>>>> jun_class
 });
 
 app.post('/register', async (req, res) => {
   // check if username and password are valid. if not, tell user that input was invalid
+<<<<<<< HEAD
   const { username, password, confirmPassword } = req.body;
 
   // username and password should contain valid characters and be properly sized
@@ -134,10 +139,34 @@ app.post('/register', async (req, res) => {
   const pwdMatch = password === confirmPassword;
 
   if (!(userIsValid && pwdIsValid && pwdMatch)) {
+=======
+  const { username, password1, password2 } = req.body;
+
+  if (!/^[a-zA-Z]+[a-zA-Z0-9_]*$/.test(username) ||
+    !/^[a-zA-Z0-9_*]*$/.test(password1) ||
+    username.length < 5 || password1.length < 5 ||
+    password1 !== password2) {
+>>>>>>> jun_class
     console.log('ERROR: user entered invalid username and/or password during registration');
     return res.status(400).render('pages/register', {
       error: true,
+<<<<<<< HEAD
       message: messages.register_invalidUserOrPwd(),
+=======
+      message:
+        `<div class='container-fluid'>
+  <p>Invalid username or password, or passwords do not match</p>
+  <p>Usernames and passwords should be at least 5 characters long,
+  consisting of:</p>
+  <ul>
+    <li>lower- and upper-case letters (<kbd>a</kbd>-<kbd>z</kbd>, <kbd>A</kbd>-<kbd>Z</kbd>)</li>
+    <li>digits (<kbd>0</kbd>-<kbd>9</kbd>) (usernames can't start with a digit)</li>
+    <li>underscores (<kbd>_</kbd>) (usernames can't start with an underscore)</li>
+    <li>Passwords may additionally use stars (<kbd>*</kbd>)</li>
+  </ul>
+</div>`,
+      notRegistered: true,
+>>>>>>> jun_class
     });
   }
 
@@ -155,7 +184,10 @@ app.post('/register', async (req, res) => {
         message: messages.register_userExists(username),
       });
     } else {
+<<<<<<< HEAD
       // if this is a new user, register it
+=======
+>>>>>>> jun_class
       const { user_id: userId } = await t.one('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *', [username, hash]);
 
       // login for user
@@ -172,10 +204,39 @@ app.post('/register', async (req, res) => {
   }).catch(err => genericFail('pages/register', res, err));
 });
 
+<<<<<<< HEAD
 app.get('/register/preferences', (req, res) => {
   // only new accounts should select preferences
   if (!req.session.newAccount) {
     return res.redirect('/register');
+=======
+app.post('/register_preferences', (req, res) => {
+  const classes = req.body.class_prefs;
+  const names = [];
+  if (typeof classes === 'string' || typeof classes === 'number') {
+    names.push(`${classes}`);
+  } else {
+    classes.forEach(name => names.push(name));
+    db.task(async function addPrefs(t) {
+      if (names.length > 0) {
+        const name = names.pop();
+        const query1 = `SELECT class_id FROM classes WHERE class_name = $1 LIMIT 1`;
+        const query2 = `INSERT INTO users_to_classes (user_id, class_id) VALUES ($1, $2) RETURNING *`;
+        const { class_id: classId } = await t.one(query1, [name]);
+        await t.one(query2, [req.session.userId, classId]);
+
+        console.log(`added class ${name} (${classId}) to user ${req.session.username} (${req.session.userId})`);
+        return addPrefs(t);
+      }
+    })
+      .catch(err => {
+        console.log(err);
+        res.render('pages/profile', {
+          error: true,
+          message: err.message,
+        });
+      });
+>>>>>>> jun_class
   }
 
   delete req.session.newAccount;
@@ -273,6 +334,7 @@ app.get('/profile', (req, res) => {
   res.redirect('/profile/update');
 });
 
+<<<<<<< HEAD
 app.get('/profile/update', async (req, res) => {
   if (req.session.user) {
     return res.render('pages/profile_update', {
@@ -373,6 +435,46 @@ app.post('/profile/classes', async (req, res) => {
  */
 app.get('/classes', (req, res) => {
   res.render('pages/classes')
+=======
+//API route for class page
+app.get('/classes', async (req, res) => {
+  try {
+    const classNames = await db.manyOrNone('SELECT class_name FROM classes');
+    res.render('pages/classes', {
+      classes: classNames.map(row => row.class_name),
+      message: null
+    })
+  } catch (err) { 
+    console.log(err);
+    res.render('pages/classes', {
+      classes: [],
+      message: err.message
+    });}
+});
+
+app.post('/new_question', (req, res) => {
+  const { question_name, questions_info, class_id } = req.body;
+
+  const query_questions = `INSERT INTO questions VALUES ($1,$2);`;
+  const query_classes = `INSERT INTO classes_to_questions VALUES ($1,$2);`
+  const query_asked_question = `INSERT INTO users_to_asked_question VALUES (req.session.user.user_id,$1);`
+
+  const query_id = `SELECT LAST_INSERT_ID();`
+
+  try {
+    db.none(query_questions, [question_name, questions_info]);
+    const question_id = db.one(query_id);
+    db.none(query_classes, [class_id, question_id]);
+    db.none(query_asked_question, [question_id])
+
+  } catch (err) {
+    console.log(err);
+    res.render('pages/classes', {
+      classes: classNames.map(row => row.class_name),
+      message: err.message
+    })
+  }
+>>>>>>> jun_class
 });
 
 app.get('/courses', (req, res) => {
