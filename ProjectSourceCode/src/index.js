@@ -91,7 +91,7 @@ app.post('/register', async (req, res) => {
     username.length < 5 || password1.length < 5 ||
     password1 !== password2) {
     console.log('ERROR: user entered invalid username and/or password during registration');
-    res.render('pages/register', {
+    res.status(400).render('pages/register', {
       error: true,
       message:
         `<div class='container-fluid'>
@@ -117,7 +117,7 @@ app.post('/register', async (req, res) => {
   db.task(async t => {
     const existingUser = await t.oneOrNone('SELECT COUNT(*) FROM users WHERE username = $1', [username]);
     if (Number(existingUser.count) > 0) {
-      res.render('pages/register', {
+      res.status(400).render('pages/register', {
         error: true,
         message: `User with name '${username}' already exists. Please choose another username.`,
         notRegistered: true,
@@ -132,7 +132,7 @@ app.post('/register', async (req, res) => {
 
       const classNames = await t.any('SELECT class_name FROM classes');
 
-      res.render('pages/register', {
+      res.status(201).render('pages/register', {
         notRegistered: false,
         username: req.session.username,
         classes: classNames.map(row => row.class_name),
@@ -141,7 +141,7 @@ app.post('/register', async (req, res) => {
   })
     .catch(err => {
       console.log(err);
-      res.render('pages/register', {
+      res.status(500).render('pages/register', {
         error: true,
         message: err.message,
       });
@@ -200,7 +200,7 @@ app.post('/login', async (req, res) => {
       req.session.save();
       res.redirect('/profile')
     } else {
-      res.render('pages/login', { message: 'Invalid username or password' })
+      res.status(400).render('pages/login', { message: 'Invalid username or password' })
     }
   } catch (error) {
     console.error('Login error:', error);
@@ -344,6 +344,11 @@ app.get('/courses', (req, res) => {
       });
 });
 
+// dummy API for testing
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
+
 // start server
-app.listen(3000);
+module.exports = app.listen(3000);
 console.log('Server listening on port 3000');

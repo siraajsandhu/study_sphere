@@ -11,3 +11,9 @@ Meeting 2 (11/04)
   - each group member should work in a seperate branch, then merge to main
 
 Meeting 3 (11/11)
+- went over progress of this week
+- Feedback:
+  -  move change password from profile into a settings page
+  -  speed up progress
+  -  complete front end & back end at the same time
+  -  begin integration of pages starting next week at the latest
