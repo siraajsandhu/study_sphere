@@ -62,22 +62,22 @@ app.use('/resources', express.static(path.join(__dirname, 'resources')));
 
 // Register API route:
 app.get('/register', (req, res) => {
-  res.render('pages/register', {notRegistered: true});
+  res.render('pages/register', { notRegistered: true });
 });
 
 app.post('/register', async (req, res) => {
   // check if username and password are valid. if not, tell user that input was invalid
-  const {username, password1, password2} = req.body;
+  const { username, password1, password2 } = req.body;
 
-  if (!/^[a-zA-Z]+[a-zA-Z0-9_]*$/.test(username) || 
-      !/^[a-zA-Z0-9_*]*$/.test(password1) ||
-      username.length < 5 || password1.length < 5 ||
-      password1 !== password2) {
+  if (!/^[a-zA-Z]+[a-zA-Z0-9_]*$/.test(username) ||
+    !/^[a-zA-Z0-9_*]*$/.test(password1) ||
+    username.length < 5 || password1.length < 5 ||
+    password1 !== password2) {
     console.log('ERROR: user entered invalid username and/or password during registration');
     res.render('pages/register', {
       error: true,
       message:
-`<div class='container-fluid'>
+        `<div class='container-fluid'>
   <p>Invalid username or password, or passwords do not match</p>
   <p>Usernames and passwords should be at least 5 characters long,
   consisting of:</p>
@@ -106,7 +106,7 @@ app.post('/register', async (req, res) => {
         notRegistered: true,
       });
     } else {
-      const {user_id: userId} = await t.one('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *', [username, hash]);
+      const { user_id: userId } = await t.one('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *', [username, hash]);
 
       // login for user
       req.session.username = username;
@@ -143,9 +143,9 @@ app.post('/register_preferences', (req, res) => {
         const name = names.pop();
         const query1 = `SELECT class_id FROM classes WHERE class_name = $1 LIMIT 1`;
         const query2 = `INSERT INTO users_to_classes (user_id, class_id) VALUES ($1, $2) RETURNING *`;
-        const {class_id: classId} = await t.one(query1, [name]);
+        const { class_id: classId } = await t.one(query1, [name]);
         await t.one(query2, [req.session.userId, classId]);
-        
+
         console.log(`added class ${name} (${classId}) to user ${req.session.username} (${req.session.userId})`);
         return addPrefs(t);
       }
@@ -198,8 +198,44 @@ app.get('/profile', (req, res) => {
   })
 });
 
-app.get('/classes' ,(req,res)=>{
-  res.render('pages/classes')
+//API route for class page
+app.get('/classes', async (req, res) => {
+  try {
+    const classNames = await db.manyOrNone('SELECT class_name FROM classes');
+    res.render('pages/classes', {
+      classes: classNames.map(row => row.class_name),
+      message: null
+    })
+  } catch (err) { 
+    console.log(err);
+    res.render('pages/classes', {
+      classes: [],
+      message: err.message
+    });}
+});
+
+app.post('/new_question', (req, res) => {
+  const { question_name, questions_info, class_id } = req.body;
+
+  const query_questions = `INSERT INTO questions VALUES ($1,$2);`;
+  const query_classes = `INSERT INTO classes_to_questions VALUES ($1,$2);`
+  const query_asked_question = `INSERT INTO users_to_asked_question VALUES (req.session.user.user_id,$1);`
+
+  const query_id = `SELECT LAST_INSERT_ID();`
+
+  try {
+    db.none(query_questions, [question_name, questions_info]);
+    const question_id = db.one(query_id);
+    db.none(query_classes, [class_id, question_id]);
+    db.none(query_asked_question, [question_id])
+
+  } catch (err) {
+    console.log(err);
+    res.render('pages/classes', {
+      classes: classNames.map(row => row.class_name),
+      message: err.message
+    })
+  }
 });
 
 // start server
