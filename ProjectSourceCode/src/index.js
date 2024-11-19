@@ -161,23 +161,33 @@ app.post('/', async (req, res) => {
  * REGISTER API ROUTE(S)
  */
 app.get('/register', (req, res) => {
-  res.render('pages/register');
+  res.render('pages/register', { notRegistered: true });
 });
 
 app.post('/register', async (req, res) => {
   // check if username and password are valid. if not, tell user that input was invalid
-  const { username, password, confirmPassword } = req.body;
+  const { username, password1, password2 } = req.body;
 
-  // username and password should contain valid characters and be properly sized
-  const userIsValid = /^[a-zA-Z]+[a-zA-Z0-9_]*$/.test(username) && username.length >= 5;
-  const pwdIsValid = /^[a-zA-Z0-9_*]*$/.test(password) && password.length >= 5;
-  const pwdMatch = password === confirmPassword;
-
-  if (!(userIsValid && pwdIsValid && pwdMatch)) {
+  if (!/^[a-zA-Z]+[a-zA-Z0-9_]*$/.test(username) ||
+    !/^[a-zA-Z0-9_*]*$/.test(password1) ||
+    username.length < 5 || password1.length < 5 ||
+    password1 !== password2) {
     console.log('ERROR: user entered invalid username and/or password during registration');
     return res.status(400).render('pages/register', {
       error: true,
-      message: messages.register_invalidUserOrPwd(),
+      message:
+        `<div class='container-fluid'>
+  <p>Invalid username or password, or passwords do not match</p>
+  <p>Usernames and passwords should be at least 5 characters long,
+  consisting of:</p>
+  <ul>
+    <li>lower- and upper-case letters (<kbd>a</kbd>-<kbd>z</kbd>, <kbd>A</kbd>-<kbd>Z</kbd>)</li>
+    <li>digits (<kbd>0</kbd>-<kbd>9</kbd>) (usernames can't start with a digit)</li>
+    <li>underscores (<kbd>_</kbd>) (usernames can't start with an underscore)</li>
+    <li>Passwords may additionally use stars (<kbd>*</kbd>)</li>
+  </ul>
+</div>`,
+      notRegistered: true,
     });
   }
 
@@ -195,7 +205,6 @@ app.post('/register', async (req, res) => {
         message: messages.register_userExists(username),
       });
     } else {
-      // if this is a new user, register it
       const { user_id: userId } = await t.one('INSERT INTO users (username, password) VALUES ($1, $2) RETURNING *', [username, hash]);
 
       // login for user
@@ -212,10 +221,32 @@ app.post('/register', async (req, res) => {
   }).catch(err => genericFail('pages/register', res, err));
 });
 
-app.get('/register/preferences', (req, res) => {
-  // only new accounts should select preferences
-  if (!req.session.newAccount) {
-    return res.redirect('/register');
+app.post('/register_preferences', (req, res) => {
+  const classes = req.body.class_prefs;
+  const names = [];
+  if (typeof classes === 'string' || typeof classes === 'number') {
+    names.push(`${classes}`);
+  } else {
+    classes.forEach(name => names.push(name));
+    db.task(async function addPrefs(t) {
+      if (names.length > 0) {
+        const name = names.pop();
+        const query1 = `SELECT class_id FROM classes WHERE class_name = $1 LIMIT 1`;
+        const query2 = `INSERT INTO users_to_classes (user_id, class_id) VALUES ($1, $2) RETURNING *`;
+        const { class_id: classId } = await t.one(query1, [name]);
+        await t.one(query2, [req.session.userId, classId]);
+
+        console.log(`added class ${name} (${classId}) to user ${req.session.username} (${req.session.userId})`);
+        return addPrefs(t);
+      }
+    })
+      .catch(err => {
+        console.log(err);
+        res.render('pages/profile', {
+          error: true,
+          message: err.message,
+        });
+      });
   }
 
   delete req.session.newAccount;
@@ -313,106 +344,44 @@ app.get('/profile', (req, res) => {
   res.redirect('/profile/update');
 });
 
-app.get('/profile/update', async (req, res) => {
-  if (req.session.user) {
-    return res.render('pages/profile_update', {
-      user: req.session.user,
-    });
-  } else {
-    res.redirect('/login');
-  }
+//API route for class page
+app.get('/classes', async (req, res) => {
+  try {
+    const classNames = await db.manyOrNone('SELECT class_name FROM classes');
+    res.render('pages/classes', {
+      classes: classNames.map(row => row.class_name),
+      message: null
+    })
+  } catch (err) { 
+    console.log(err);
+    res.render('pages/classes', {
+      classes: [],
+      message: err.message
+    });}
 });
 
-app.post('/profile/update', async (req, res) => {
+app.post('/new_question', (req, res) => {
+  const { question_name, questions_info, class_id } = req.body;
+
+  const query_questions = `INSERT INTO questions VALUES ($1,$2);`;
+  const query_classes = `INSERT INTO classes_to_questions VALUES ($1,$2);`
+  const query_asked_question = `INSERT INTO users_to_asked_question VALUES (req.session.user.user_id,$1);`
+
+  const query_id = `SELECT LAST_INSERT_ID();`
+
   try {
-    if (!req.session.user) {
-      res.redirect('/login');
-    }
+    db.none(query_questions, [question_name, questions_info]);
+    const question_id = db.one(query_id);
+    db.none(query_classes, [class_id, question_id]);
+    db.none(query_asked_question, [question_id])
 
-    const { userId, username } = req.session.user;
-    const { oldPwd, newPwd, confirmNewPwd } = req.body;
-    const profile = await db.one('SELECT * FROM users WHERE user_id = $1', [userId]);
-    
-    if (!await bcrypt.compare(oldPwd, profile.password)) {
-      return res.render('pages/profile_update', {
-        user: req.session.user,
-        error: true,
-        message: messages.profile_pwdMatchFailure(),
-      });
-    }
-
-    const pwdIsValid = /^[a-zA-Z0-9_*]*$/.test(newPwd) && newPwd.length >= 5;
-    const pwdMatch = newPwd === confirmNewPwd;
-
-    if (!(pwdIsValid && pwdMatch)) {
-      return res.render('pages/profile_update', {
-        user: req.session.user,
-        error: true,
-        message: messages.profile_invalidPwd(),
-      });
-    }
-
-    const newHash = await bcrypt.hash(newPwd, 10);
-    const query = `UPDATE users SET password = $1 WHERE user_id = $2`;
-    await db.any(query, [newHash, userId]);
-
-    return res.render('pages/profile_update', {
-      user: req.session.user,
-      error: false,
-      message: messages.profile_pwdUpdateSuccess(),
-    });
   } catch (err) {
-    genericFail('pages/profile_update', res, err);
+    console.log(err);
+    res.render('pages/classes', {
+      classes: classNames.map(row => row.class_name),
+      message: err.message
+    })
   }
-});
-
-app.get('/profile/classes', async (req, res) => {
-  try {
-    const { username, userId } = req.session.user;
-    const classes = await db.any(
-`SELECT c.class_name, c.class_desc, c.class_id 
-FROM users_to_classes uc 
-INNER JOIN classes c ON uc.class_id=c.class_id 
-WHERE uc.user_id = $1`, 
-      [userId]);
-
-    console.log(classes);
-
-    const params = {
-      user: req.session.user,
-      classes,
-    };
-
-    if (req.query.removed) {
-      params.message = messages.profile_deletedClass(req.query.removed);
-    }
-
-    return res.render('pages/profile_classes', params);
-  } catch(err) {
-    genericFail('pages/profile_update', res, err);
-  }
-});
-
-app.post('/profile/classes', async (req, res) => {
-  try {
-    const { username, userId } = req.session.user;
-    const classId = req.body.classId;
-    
-    await db.any('DELETE FROM users_to_classes WHERE (user_id=$1 AND class_id=$2)', [userId, classId]);
-
-    return res.redirect(
-      `/profile/classes?removed=${req.body.className}`,
-    );
-  } catch(err) {
-    genericFail('pages/profile_classes', res, err);
-  }
-});
-
-/**
- * CLASSES API ROUTE(S)
- */
-app.get('/classes', (req, res) => {
-  res.render('pages/classes')
 });
 
 app.get('/courses', (req, res) => {
@@ -431,6 +400,19 @@ app.get('/courses', (req, res) => {
         message: err.message,
       });
       });
+});
+
+
+app.get('/createClass',(req,res) => {
+  const class_name = req.session.class;
+  const query="SELECT * from classes WHERE class_name=$1";
+  db.task(query,class_name)
+    if (query!=NULL){
+      res.session="INSERT into classes (class_name) VALUES ($1)";
+      /* testing query */
+      console.log("successfully added into table");
+    }
+  document.getElementById("class_name")="";
 });
 
 /**
