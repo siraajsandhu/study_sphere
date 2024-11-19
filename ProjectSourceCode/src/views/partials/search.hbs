@@ -9,8 +9,8 @@
         <input id="search-key-input" list="class-list" placeholder="Search by course name" class="form-control"/>
         <button onclick="search()" class="btn btn-secondary" id="search-btn" type="button" aria-describedby="button-addon2">Search</button>
       </div>
-      <div id="search-table-container" style="display: none;">
-        <table class="table table-sm table-bordered m-0 p-0" id="search-table">
+      <div id="search-table-container" style="display: none; z-index: 100; box-shadow: 2px 2px 5px rgba(0,0,0,0.5); ">
+        <table class="table table-sm table-bordered table-striped m-0 p-0" id="search-table">
           <tbody id="search-table-body"></tbody>
         </table>
       </div>
@@ -54,7 +54,7 @@
           const msg = document.createElement('td');
           msg.textContent = 'nothing found';
           row.appendChild(msg);
-          row.classList.add('search-empty');
+          row.classList.add('fst-italic', 'text-muted');
           resTable.appendChild(row);
         }
 

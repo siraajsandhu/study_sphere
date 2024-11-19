@@ -34,4 +34,6 @@
   module.exports.profile_pwdUpdateSuccess = () => `Profile updated successfully`;
 
   module.exports.profile_deletedClass = name => `Removed class '${name}'`;
+
+  module.exports.home_courseExists = name => `Class '${name}' already exists.`
 }());

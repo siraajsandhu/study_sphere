@@ -76,7 +76,7 @@ function genericFail(route, res, err) {
  */
 // whitelist tables/fields
 const SEARCH_WHITELIST = {
-  'classes': ['class_name', 'class_desc'],
+  'classes': ['class_name', 'class_desc', 'class_id'],
 };
 
 app.get('/search_util', (req, res) => {
@@ -113,8 +113,48 @@ app.get('/search_util', (req, res) => {
 /**
  * HOME API ROUTE(S)
  */
-app.get('/', (req, res) => {
-  res.render('pages/home');
+app.get('/', async (req, res) => {
+  const classes = await db.any('SELECT * FROM classes');
+  
+  const params = {
+    user: req.session.user,
+    classes,
+    searchMeta: {
+      table: 'classes',
+      field: 'class_name',
+      title: 'Search for classes by course title',
+    },
+  };
+
+  if (req.query.course_exists) {
+    params.error = true;
+    params.message = messages.home_courseExists(req.query.course_exists);
+  }
+
+  res.render('pages/home', params);
+});
+
+app.post('/', async (req, res) => {
+  // if (!req.session.user) {
+  //   return res.redirect('/login');
+  // }
+
+  const { class_dept: dept, class_num: num, class_desc: desc } = req.body;
+  const name = dept + num;
+
+  // check if this course exists
+  const existingCourse = await db.one(
+    `SELECT COUNT(*) FROM classes WHERE LOWER(class_name) = $1`, [name.toLowerCase()],
+  );
+
+  if (Number(existingCourse.count) > 0) {
+    return res.redirect(
+      `/?course_exists=${encodeURIComponent(name)}`,
+    )
+  } else {
+    const {class_id: classId} = await db.one(`INSERT INTO classes (class_name, class_desc) VALUES ($1, $2) RETURNING *`, [name, desc]);
+    return res.redirect(`/class/${classId}`);
+  }
 });
 
 /**
