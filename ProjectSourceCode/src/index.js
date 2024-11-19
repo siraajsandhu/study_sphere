@@ -344,6 +344,101 @@ app.get('/profile', (req, res) => {
   res.redirect('/profile/update');
 });
 
+app.get('/profile/update', async (req, res) => {
+  if (req.session.user) {
+    return res.render('pages/profile_update', {
+      user: req.session.user,
+    });
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.post('/profile/update', async (req, res) => {
+  try {
+    if (!req.session.user) {
+      res.redirect('/login');
+    }
+
+    const { userId, username } = req.session.user;
+    const { oldPwd, newPwd, confirmNewPwd } = req.body;
+    const profile = await db.one('SELECT * FROM users WHERE user_id = $1', [userId]);
+    
+    if (!await bcrypt.compare(oldPwd, profile.password)) {
+      return res.render('pages/profile_update', {
+        user: req.session.user,
+        error: true,
+        message: messages.profile_pwdMatchFailure(),
+      });
+    }
+
+    const pwdIsValid = /^[a-zA-Z0-9_*]*$/.test(newPwd) && newPwd.length >= 5;
+    const pwdMatch = newPwd === confirmNewPwd;
+
+    if (!(pwdIsValid && pwdMatch)) {
+      return res.render('pages/profile_update', {
+        user: req.session.user,
+        error: true,
+        message: messages.profile_invalidPwd(),
+      });
+    }
+
+    const newHash = await bcrypt.hash(newPwd, 10);
+    const query = `UPDATE users SET password = $1 WHERE user_id = $2`;
+    await db.any(query, [newHash, userId]);
+
+    return res.render('pages/profile_update', {
+      user: req.session.user,
+      error: false,
+      message: messages.profile_pwdUpdateSuccess(),
+    });
+  } catch (err) {
+    genericFail('pages/profile_update', res, err);
+  }
+});
+
+app.get('/profile/classes', async (req, res) => {
+  try {
+    const { username, userId } = req.session.user;
+    const classes = await db.any(
+`SELECT c.class_name, c.class_desc, c.class_id 
+FROM users_to_classes uc 
+INNER JOIN classes c ON uc.class_id=c.class_id 
+WHERE uc.user_id = $1`, 
+      [userId]);
+
+    console.log(classes);
+
+    const params = {
+      user: req.session.user,
+      classes,
+    };
+
+    if (req.query.removed) {
+      params.message = messages.profile_deletedClass(req.query.removed);
+    }
+
+    return res.render('pages/profile_classes', params);
+  } catch(err) {
+    genericFail('pages/profile_update', res, err);
+  }
+});
+
+app.post('/profile/classes', async (req, res) => {
+  try {
+    const { username, userId } = req.session.user;
+    const classId = req.body.classId;
+    
+    await db.any('DELETE FROM users_to_classes WHERE (user_id=$1 AND class_id=$2)', [userId, classId]);
+
+    return res.redirect(
+      `/profile/classes?removed=${req.body.className}`,
+    );
+  } catch(err) {
+    genericFail('pages/profile_classes', res, err);
+  }
+});
+
 //API route for class page
 app.get('/classes', async (req, res) => {
   try {
