@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS questions (
   questions_info VARCHAR(150) NOT NULL
 );
 
+
 ALTER TABLE classes_to_questions
   ADD CONSTRAINT fk_cq_questions 
   FOREIGN KEY (question_id)
