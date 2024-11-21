@@ -510,10 +510,12 @@ app.get('/createClass',(req,res) => {
   document.getElementById("class_name")="";
 });
 
+
 //API route to render questions page
-app.get('/question', (req, res) => {
-  res.render('pages/question');
-});
+app.get('/question', (req,res) =>{
+  res.render('/pages/question');
+})
+
 
 //bookmark to question API route
 app.post('/bookmark_question', async (req, res) => {
