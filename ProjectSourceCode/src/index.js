@@ -516,7 +516,6 @@ app.get('/question', (req,res) =>{
   res.render('/pages/question');
 })
 
-
 //bookmark to question API route
 app.post('/bookmark_question', async (req, res) => {
   if(req.session.username) {
