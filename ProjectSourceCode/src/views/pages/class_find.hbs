@@ -7,9 +7,6 @@
     {{> message}}
 
     <p>{{classInfo.desc}}</p>
-    <p>
-      Join the <a href="/class/{{classInfo.id}}/chat">{{classInfo.name}} chat</a> for informal discussion!
-    </p>
     <form class="" action="/class/{{classInfo.id}}/find" method="POST">
       <input type="hidden" value="{{classInfo.id}}" name="classId"/>
       {{#if user}}
@@ -21,6 +18,8 @@
       {{else}}
         <input type="submit" class="btn btn-outline-secondary" value="Join" disabled/>
       {{/if}}
+
+      <a class="btn btn-outline-primary" href="/class/{{classInfo.id}}/chat">Join the {{classInfo.name}} chat</a>
     </form>
 
     <ul class="nav nav-tabs mt-2">

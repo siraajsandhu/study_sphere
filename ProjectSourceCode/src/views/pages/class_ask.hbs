@@ -2,6 +2,22 @@
   <div class="container-fluid w-75">
     <h1>Welcome to {{classInfo.name}}</h1>
     <p>{{classInfo.desc}}</p>
+    
+    <form class="" action="/class/{{classInfo.id}}/find" method="POST">
+      <input type="hidden" value="{{classInfo.id}}" name="classId"/>
+      {{#if user}}
+        {{#if joined}}
+          <input type="submit" class="btn btn-outline-danger" value="Leave"/>
+        {{else}}
+          <input type="submit" class="btn btn-outline-secondary" value="Join"/>
+        {{/if}}
+      {{else}}
+        <input type="submit" class="btn btn-outline-secondary" value="Join" disabled/>
+      {{/if}}
+
+      <a class="btn btn-outline-primary" href="/class/{{classInfo.id}}/chat">Join the {{classInfo.name}} chat</a>
+    </form>
+
     <ul class="nav nav-tabs mt-2">
         <li class="nav-item">
             <a class="nav-link" href="/class/{{classInfo.id}}/find">Find Question</a>

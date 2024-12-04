@@ -429,6 +429,19 @@ app.get('/class/:classId/ask', async (req, res) => {
     res.redirect(`/class/${classId}/find?needs_account=true`);
   }
 
+  // check if joined
+  const additionalParams = {};
+  if (req.session.user) {
+    const {count} = await db.one(
+      'SELECT COUNT(*) FROM classes c JOIN users_to_classes uc ON c.class_id = uc.class_id WHERE c.class_id = $1 AND uc.user_id = $2',
+      [classId, req.session.user.userId],
+    );
+    
+    if (Number(count) > 0) {
+      additionalParams.joined = true;
+    }
+  }
+
   if (classExists.length > 0) {
     const [row] = classExists;
     res.render('pages/class_ask', {
@@ -438,6 +451,7 @@ app.get('/class/:classId/ask', async (req, res) => {
         desc: row.class_desc,
         id: classId,
       },
+      ...additionalParams,
     });
   } else {
     // if the class doesn't exist, just redirect to the home page for now
@@ -542,6 +556,43 @@ app.get('/class/:classId/chat', async (req, res) => {
     });
   } else {
     res.redirect('/');
+  }
+});
+
+app.post('/class/:classId/chat/messages', (req, res) => {
+  const { username, message, date } = req.body;
+  const { classId } = req.params;
+  if (!MESSAGE_STORE.has(classId)) {
+    MESSAGE_STORE.set(classId, []);
+  }
+
+  const backlog = MESSAGE_STORE.get(classId);
+  backlog.unshift({ username, message, date });
+
+  if (backlog.length > 20) {
+    backlog.length = 20;
+  }
+});
+
+app.get('/class/:classId/chat/messages', (req, res) => {
+  try {
+    console.log('GOT REQ');
+
+    const { since } = req.query;
+    const { classId } = req.params;
+    
+    if (MESSAGE_STORE.has(classId)) {
+      const backlog = MESSAGE_STORE.get(classId);
+      console.log(backlog.filter(({date}) => date > Number(since)));
+      res.status(200).json({
+        messages: backlog.filter(({date}) => date > Number(since)),
+      });
+    } else {
+      res.status(200).json({ messages: [] });
+    }
+  } catch(e) {
+    console.log('ERROR', e);
+    res.status(200).json({messages: []});
   }
 });
 
