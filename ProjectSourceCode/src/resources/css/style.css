@@ -2,14 +2,14 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2; /* Neutral background */
-    color: #2e2e2e; /* Text color */
+    background-color: #f2f2f2 !important; /* Neutral background */
+    color: #2e2e2e !important; /* Text color */
 }
 
 /* Header */
 header {
-    background-color: #7851a9; /* Royal purple */
-    color: #ffffff; /* White text */
+    background-color: #7851a9 !important; /* Royal purple */
+    color: #ffffff !important; /* White text */
     padding: 20px;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -17,8 +17,8 @@ header {
 
 /* Buttons */
 button {
-    background-color: #7851a9; /* Royal purple */
-    color: #ffffff; /* White text */
+    background-color: #7851a9 !important; /* Royal purple */
+    color: #ffffff !important; /* White text */
     border: none;
     padding: 10px 20px;
     margin: 10px;
@@ -27,29 +27,29 @@ button {
 }
 
 button:hover {
-    background-color: #6b47a1; /* Slightly darker purple for hover effect */
+    background-color: #6b47a1 !important; /* Slightly darker purple for hover effect */
 }
 
 /* Links */
 a {
-    color: #7851a9; /* Royal purple for links */
+    color: #7851a9 !important; /* Royal purple for links */
     text-decoration: none;
 }
 
 a:hover {
     text-decoration: underline;
-    color: #6b47a1; /* Darker purple for hover effect */
+    color: #6b47a1 !important; /* Darker purple for hover effect */
 }
 
 /* Section Headers */
 h1, h2, h3 {
-    color: #7851a9; /* Royal purple for headings */
+    color: #7851a9 !important; /* Royal purple for headings */
 }
 
 /* Cards or Boxes */
 .card {
-    background-color: #ffffff; /* White background */
-    border: 2px solid #7851a9; /* Royal purple border */
+    background-color: #ffffff !important; /* White background */
+    border: 2px solid #7851a9 !important; /* Royal purple border */
     border-radius: 10px;
     padding: 20px;
     margin: 20px;
@@ -58,8 +58,8 @@ h1, h2, h3 {
 
 /* Footer */
 footer {
-    background-color: #7851a9;
-    color: #ffffff;
+    background-color: #7851a9 !important;
+    color: #ffffff !important;
     text-align: center;
     padding: 10px;
     position: fixed;
