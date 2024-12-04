@@ -26,6 +26,16 @@ button {
     cursor: pointer;
 }
 
+button.btn-primary{
+    background-color: #7851a9 !important; /* Royal purple */
+    color: #ffffff !important; /* White text */
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
 button:hover {
     background-color: #6b47a1 !important; /* Slightly darker purple for hover effect */
 }
