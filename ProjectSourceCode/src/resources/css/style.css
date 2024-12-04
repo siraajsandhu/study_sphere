@@ -19,7 +19,7 @@ header {
 button {
     background-color: #7851a9; /* Royal purple */
     color: #ffffff; /* White text */
-    border: none;
+    border: #7851a9;
     padding: 10px 20px;
     margin: 10px;
     border-radius: 5px;
@@ -37,7 +37,7 @@ button.btn btn-primary{
 }
 
 button:hover {
-    background-color: #6b47a1 !important; /* Slightly darker purple for hover effect */
+    background-color: #4a2681 !important; /* Slightly darker purple for hover effect */
 }
 
 /* Links */
