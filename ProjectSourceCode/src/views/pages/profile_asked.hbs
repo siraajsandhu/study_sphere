@@ -8,14 +8,14 @@
             <a class="nav-link" href="/profile/classes">Classes</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link active" href="#">Bookmarked Questions</a>
+            <a class="nav-link" href="/profile/bookmarks">Bookmarked Questions</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/profile/asked">Asked Questions</a>
+            <a class="nav-link active" href="#">Asked Questions</a>
         </li>
     </ul>
     <div class="container-fluid w-50 mt-3">
-        <h2>My Bookmarked Questions</h2>
+        <h2>My Asked Questions</h2>
         {{> message}}
     {{#if questions.length}}
       {{!-- should sort by most recent --}}
@@ -47,7 +47,7 @@
       </table>
     {{else}}
       <p>
-        You have not bookmarked any questions yet.
+        You have not asked any questions yet.
       </p>
     {{/if}}
     </div>

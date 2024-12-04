@@ -1,0 +1,90 @@
+<div class="container-fluid d-flex flex-column w-100 p-4">
+  <div class="container-fluid w-75">
+    <h1>
+      Welcome to {{classInfo.name}}
+    </h1>
+
+    {{> message}}
+
+    <p>{{classInfo.desc}}</p>
+    <p>
+      Join the <a href="/class/{{classInfo.id}}/chat">{{classInfo.name}} chat</a> for informal discussion!
+    </p>
+    <form class="" action="/class/{{classInfo.id}}/find" method="POST">
+      <input type="hidden" value="{{classInfo.id}}" name="classId"/>
+      {{#if user}}
+        {{#if joined}}
+          <input type="submit" class="btn btn-outline-danger" value="Leave"/>
+        {{else}}
+          <input type="submit" class="btn btn-outline-secondary" value="Join"/>
+        {{/if}}
+      {{else}}
+        <input type="submit" class="btn btn-outline-secondary" value="Join" disabled/>
+      {{/if}}
+    </form>
+
+    <ul class="nav nav-tabs mt-2">
+        <li class="nav-item">
+            <a class="nav-link active" href="#">Find Question</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/class/{{classInfo.id}}/ask">Ask Question</a>
+        </li>
+    </ul>
+    
+    <h3 class="mt-3">Find a Question</h3>
+    {{> search}}
+
+    <h3 class="mt-3">Popular Questions</h3>
+    {{#if questions.length}}
+      {{!-- should sort by most recent --}}
+      <table class="table table-bordered table-striped q-table w-100 mw-100">
+        <colgroup>
+          <col/>
+          <col style="width:60%;"/>
+          <col/>
+        </colgroup>
+        <thead class="table-dark">
+          <tr>
+            <th>Question</th>
+            <th>Preview</th>
+            <th>Date Asked</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each questions}}
+            <tr>
+              <td><a href="/question/{{this.question_id}}">{{this.question_title}}</a></td>
+              <td style="text-overflow: ellipsis; white-space: nowrap; overflow: hidden;">{{this.question_content}}</td>
+              <td>{{this.question_date}}</td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    {{else}}
+      <p>
+        No questions have been posted for this class. 
+        Maybe you can <a href="class/{{classInfo.classId}}/ask">ask the first one</a>!
+      </p>
+    {{/if}}
+    <script>
+      function handleResult(result) {
+        const td = document.createElement('td');
+        const a = document.createElement('a');
+        
+        a.href = `/question/${result.question_id}`;
+        a.textContent = result.question_title.slice(0, 80);
+  
+        if (result.question_title.length > 80)
+          a.innerHTML += '&mldr;';
+  
+        const small = document.createElement('small');
+        small.textContent = 'Jump to ';
+        small.classList.add('text-muted', 'fst-italic');
+        td.appendChild(small);
+        td.appendChild(a);
+        return td;
+      }
+    </script>
+  </div>
+</div>

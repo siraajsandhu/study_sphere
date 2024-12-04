@@ -1,6 +1,17 @@
-<div class="container-fluid">
+<div class="container-fluid d-flex flex-column w-100 p-4">
   <div class="container-fluid w-75">
-    <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
+    <h1>Class Directory</h1>
+    <ul class="nav nav-tabs mt-2">
+        <li class="nav-item">
+            <a class="nav-link" href="/find">Find Class</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link active" href="#">Create Class</a>
+        </li>
+    </ul>
+
+    {{!-- TODO: FIX CAROUSEL --}}
+    {{!-- <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">
       <div class="carousel-inner">
         <div class="carousel-item active">
           <img src="..." class="d-block w-100" alt="..."><!-- Add images from AWS -->
@@ -20,14 +31,11 @@
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
       </button>
-    </div>
+    </div> --}}
 
-    <h3 class="mt-3">Find a Class</h3>
-    {{> search}}
-
-    <h3 class="mt-3"><small class="text-muted h5">Or,</small> Create a New Class</h3>
+    <h3 class="mt-3">Create a New Class</h3>
     {{> message}}
-    <form class="w-100 d-flex flex-column gap-1" method="POST" action="/">
+    <form class="w-100 d-flex flex-column gap-1" method="POST" action="/create">
       <div class="row align-items-center">
         <label for="password" class="col-sm-4 col-form-label">Class Name</label>
         <div class="col-sm-8">
@@ -48,47 +56,6 @@
         <input type="submit" class="btn btn-primary" value="Create Class">
       </div>
     </form>
-
-    <h3 class="mt-3">Popular Classes</h3>
-    <div class="container-fluid saved mb-3">
-            <div class="row row-cols-3">
-                {{#each classes}}
-                    <div class="col mb-2 p-0 pe-2">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">{{this.class_name}}</h5>
-                                <p class="card-text">{{this.class_desc}}</p>
-                            </div>
-                            <div class="card-footer">
-                                <form action="/profile/classes", method="POST">
-                                    <input type="hidden" value="{{this.class_name}}" name="className"/>
-                                    <input type="hidden" value="{{this.class_id}}" name="classId"/>
-                                    <a href="/class/{{this.class_id}}" class="btn btn-primary" role="button">View Questions</a>
-                                    {{#if user}}
-                                      <input type="submit" class="btn btn-outline-secondary" value="Join"/>
-                                    {{else}}
-                                      <input disabled type="submit" class="btn btn-outline-secondary" value="Join"/>
-                                    {{/if}}
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                {{/each}}
-            </div>
-    <script>
-      function handleResult(result) {
-        const td = document.createElement('td');
-        const a = document.createElement('a');
-        a.href = `/class/${result.class_id}`;
-        a.textContent = result.class_name;
-        const small = document.createElement('small');
-        small.textContent = 'Jump to ';
-        small.classList.add('text-muted', 'fst-italic');
-        td.appendChild(small);
-        td.appendChild(a);
-        return td;
-      }
-    </script>
   </div>
 </div>
 {{!-- create class form --}}

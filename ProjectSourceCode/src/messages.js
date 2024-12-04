@@ -35,5 +35,13 @@
 
   module.exports.profile_deletedClass = name => `Removed class '${name}'`;
 
-  module.exports.home_courseExists = name => `Class '${name}' already exists.`
+  module.exports.home_courseExists = name => `Class '${name}' already exists.`;
+  module.exports.home_needsAccountToCreate = () => `You need an account to create a class!`;
+  module.exports.home_joinedClass = name => `Joined class '${name}'`;
+
+  module.exports.class_askedQuestion = () => `Your question was posted to the class page!`;
+  module.exports.class_needsAccountToAsk = () => `You need an account to ask a question!`;
+  module.exports.class_left = () => `Successfully left class!`;
+  module.exports.class_joined = () => `Successfully joined class!`;
+  module.exports.class_needsAccountChat = () => `You need an account to join the chat!`;
 }());

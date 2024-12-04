@@ -1,0 +1,191 @@
+<div class="container-fluid d-flex flex-column w-75 p-4">
+  <h6>&larr; Go back to <a href="/class/{{classInfo.id}}">{{classInfo.name}}</a></h6>
+  {{> message}}
+  <div class="container-fluid w-100 ps-4 pt-1">
+    <div class="container-fluid w-100 pb-4">
+      <h4>
+        {{questionInfo.title}}
+      </h4>
+      <small class="text-muted">Asked {{questionInfo.date}} by {{parentUser.name}}</small>
+      <p>
+        {{questionInfo.content}}
+      </p>
+
+      <h6>Attached Files <small class="text-muted">(click to enlarge)</small></h6>
+      {{#if images.length}}
+        {{#each images}}
+          <img src="/image/{{this.image_key}}" class="img-fluid ss-q-img w-25"/>
+        {{/each}}
+      {{else}}
+        <p class="text-muted">No files were attached to this question.</p>
+      {{/if}}
+
+      <form class="pt-3" method="POST" action="/question/{{questionInfo.id}}/bookmark">
+        <input type="hidden" value="QID"/>
+        {{#if bookmarked}}
+          <input type="submit" class="btn btn-outline-danger" value="Remove Bookmark"/>
+        {{else}}
+          <input {{#unless user}}disabled{{/unless}} type="submit" class="btn btn-outline-primary" value="Add Bookmark"/>
+        {{/if}}
+      </form>
+    </div>
+    <hr>
+    <div class="container-fluid w-100 pb-4">
+      <h5>Add an Answer</h5>
+      <form enctype="multipart/form-data" class="w-100 d-flex flex-column gap-1" method="POST" action="/question/{{questionInfo.id}}/new_answer">
+        <div class="row">
+          <label for="password" class="col-sm-2 col-form-label">Answer Content</label>
+          <div class="col-sm-10">
+            <textarea required name="content" class="form-control" placeholder="Provide your answer here."></textarea>
+          </div>
+        </div>
+        <div class="row">
+          <label class="col-sm-2 col-form-label">Upload images if needed</label>
+          <div class="col-sm-10">
+            <input name="images" type="file" multiple accept="image/png, image/jpeg"/>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end">
+          {{#if user}}
+            <input type="submit" class="btn btn-primary" value="Post Answer">
+          {{else}}
+            <input disabled type="submit" class="btn btn-primary" value="Post Answer">
+          {{/if}}
+        </div>
+      </form>
+    </div>
+    <hr>
+    <div class="container-fluid w-100 pb-4">
+      <h5>Answers</h5>
+      {{#if answers.length}}
+        {{#each answers}}
+          <div class="container-fluid" style="position: relative;">
+            <div class="card mb-3">
+              <div class="card-header">
+                  <div class="d-inline-flex gap-2 m-0 p-0 pe-2 align-items-center justify-content-center">
+                    <input type="hidden" class="ss-like-status" value="{{this.likeStatus}}" autocomplete='off'/>
+                    <button 
+                      {{#unless ../user}}disabled{{/unless}}
+                      class="ss-like btn btn-{{#if this.liked}}{{#if ../user}}success{{else}}outline-secondary{{/if}}{{else}}outline-secondary{{/if}} fw-bold"
+                      data-answer-id="{{this.answer_id}}"
+                      style="display: flex; justify-content: center; align-items: center; border-radius: 9999px; min-width: 2.5rem !important; max-width 2.5rem !important; min-height: 2.5rem !important; max-height: 2.5rem !important;">&uarr;</button>
+                    <p class="fs-5 fw-bold m-0 p-0"><span class="ss-points">{{this.numPoints}}</span> point<span class="ss-plural">{{#if this.pluralPoints}}s{{/if}}</span></p>
+                    <button 
+                      {{#unless ../user}}disabled{{/unless}}
+                      class="ss-dislike btn btn-{{#if this.disliked}}{{#if ../user}}danger{{else}}outline-secondary{{/if}}{{else}}outline-secondary{{/if}} fw-bold"
+                      data-answer-id="{{this.answer_id}}"
+                      style="display: flex; justify-content: center; align-items: center; border-radius: 9999px; min-width: 2.5rem !important; max-width 2.5rem !important; min-height: 2.5rem !important; max-height: 2.5rem !important;">&darr;</button>
+                  </div>
+                  <small class="fst-italic fw-normal text-muted">Answered by {{this.username}} on {{this.answer_date}}</small>
+              </div>
+              <div class="card-body">
+                <p class="m-0">{{this.answer_content}}</p>
+              </div>
+              {{#if this.images.length}}
+                <div class="card-footer">
+                  <h6>Attached Files <small class="text-muted">(click to enlarge)</small></h6>
+                  {{#each this.images}}
+                    <img src="/image/{{this.image_key}}" class="img-fluid ss-q-img w-25"/>
+                  {{/each}}
+                </div>
+              {{/if}}
+            </div>
+          </div>
+        {{/each}}
+        <input type="hidden" id="user_id" value="{{user.userId}}"/>
+        <script>
+          const userId = Number(document.querySelector('#user_id').value);
+          const likeBtns = document.querySelectorAll('.ss-like');
+          const dislikeBtns = document.querySelectorAll('.ss-dislike');
+
+          for (const {
+            btns, siblingClass, activeClass, siblingActiveClass, toggleValue
+          } of [
+            {btns: likeBtns, siblingClass: '.ss-dislike', activeClass: 'btn-success', siblingActiveClass: 'btn-danger', toggleValue: +1},
+            {btns: dislikeBtns, siblingClass: '.ss-like', activeClass: 'btn-danger', siblingActiveClass: 'btn-success', toggleValue: -1}
+          ]) {
+            [...btns].forEach(btn => {
+              const answerId = Number(btn.getAttribute('data-answer-id'));
+              const sibling = btn.parentElement.querySelector(siblingClass);
+              const likeStatusEl = btn.parentElement.querySelector('.ss-like-status');
+              const pointsEl = btn.parentElement.querySelector('.ss-points');
+              const pluralEl = btn.parentElement.querySelector('.ss-plural');
+
+              console.log(likeStatusEl.value);
+
+              btn.onclick = () => {
+                let likeStatus = Number(likeStatusEl.value);
+                let currentPoints = Number(pointsEl.textContent);
+
+                sibling.classList.remove(siblingActiveClass);
+                sibling.classList.add('btn-outline-secondary');
+
+                // determine state and update it
+                if (likeStatus === toggleValue) {
+                  currentPoints -= toggleValue;
+                  likeStatus = 0;
+                  btn.classList.remove(activeClass);
+                  btn.classList.add('btn-outline-secondary');
+                } else {
+                  currentPoints += toggleValue;
+                  currentPoints -= likeStatus;
+                  likeStatus = toggleValue;
+                  btn.classList.remove('btn-outline-secondary');
+                  btn.classList.add(activeClass);
+                }
+
+                // update likeStatus
+                likeStatusEl.value = likeStatus;
+
+                // track points
+                pointsEl.textContent = currentPoints;
+                pluralEl.textContent = Math.abs(currentPoints) === 1 ? '' : 's';
+
+                // TODO: AJAX
+                fetch('/vote', {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/json'},
+                  body: JSON.stringify({
+                    likeStatus,
+                    userId,
+                    answerId,
+                  }),
+                });
+              }
+            });
+          }
+        </script>
+      {{else}}
+        <p>
+          No answers have been posted yet. Maybe you can add the first!
+        </p>
+      {{/if}}
+    </div>
+  </div>
+</div>
+
+<div class="modal" tabindex="-1" id="event-modal">
+  <div class="modal-dialog modal-lg" >
+    <div class="modal-content d-flex flex-column">
+      <div class="modal-header">
+        <h5 class="modal-title">Attached File</h5>
+      </div>
+      <div class="modal-body">
+        <img id="modal-img" class="img-fluid"/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const modalEl = document.getElementById('event-modal');
+  const modal = new bootstrap.Modal(modalEl);
+  
+  const images = document.querySelectorAll('.ss-q-img');
+  [...images].forEach(img => {
+    img.onclick = function() {
+      document.getElementById('modal-img').src = img.src;
+      modal.show();
+    }
+  });
+</script>
