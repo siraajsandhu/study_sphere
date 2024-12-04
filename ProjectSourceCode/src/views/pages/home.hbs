@@ -45,7 +45,7 @@
       </div>
       
       <div class="d-flex justify-content-end">
-        <input type="submit" class="btn btn-primary" value="Create Class">
+        <input type="submit" class="btn btn-primary" style="background-color: #7851a9; text-color: #ffff" value="Create Class">
       </div>
     </form>
 
@@ -63,7 +63,7 @@
                                 <form action="/profile/classes", method="POST">
                                     <input type="hidden" value="{{this.class_name}}" name="className"/>
                                     <input type="hidden" value="{{this.class_id}}" name="classId"/>
-                                    <a href="/class/{{this.class_id}}" class="btn btn-primary" role="button">View Questions</a>
+                                    <a href="/class/{{this.class_id}}" class="btn btn-primary" style="text-color: #ffffff" role="button">View Questions</a>
                                     {{#if user}}
                                       <input type="submit" class="btn btn-outline-secondary" value="Join"/>
                                     {{else}}
