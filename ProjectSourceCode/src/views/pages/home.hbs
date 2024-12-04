@@ -25,10 +25,10 @@
     <h3 class="mt-3">Find a Class</h3>
     {{> search}}
 
-    <h3 class="mt-3"><small class="text-muted h5">Or,<button id="create_class_button" type="button" align="left" onclick="create_class_form.hidden=false">Create Class</button></h3>
+    <h3 class="mt-3"><small class="text-muted h5">Or,<button class="btn btn-primary" id="create_class_button" type="button" align="left" onclick="create_class_form.hidden=false">Create Class</button></h3>
     {{> message}}
-    <form class="w-100 d-flex flex-column gap-1" method="POST" action="/">
-      <div id="create_class_form" hidden="true" class="row align-items-center">
+    <form id="create_class_form" hidden="true" class="w-100 d-flex flex-column gap-1" method="POST" action="/">
+      <div class="row align-items-center">
         <label for="password" class="col-sm-4 col-form-label">Class Name</label>
         <div class="col-sm-8">
           <div class="input-group">
