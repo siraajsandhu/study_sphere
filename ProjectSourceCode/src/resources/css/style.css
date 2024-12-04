@@ -2,14 +2,14 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2 !important; /* Neutral background */
-    color: #2e2e2e !important; /* Text color */
+    background-color: #f2f2f2; /* Neutral background */
+    color: #2e2e2e; /* Text color */
 }
 
 /* Header */
 header {
-    background-color: #7851a9 !important; /* Royal purple */
-    color: #ffffff !important; /* White text */
+    background-color: #7851a9; /* Royal purple */
+    color: #ffffff; /* White text */
     padding: 20px;
     text-align: center;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -17,8 +17,8 @@ header {
 
 /* Buttons */
 button {
-    background-color: #7851a9 !important; /* Royal purple */
-    color: #ffffff !important; /* White text */
+    background-color: #7851a9; /* Royal purple */
+    color: #ffffff; /* White text */
     border: none;
     padding: 10px 20px;
     margin: 10px;
@@ -27,8 +27,8 @@ button {
 }
 
 button.btn btn-primary{
-    background-color: #7851a9 !important; /* Royal purple */
-    color: #ffffff !important; /* White text */
+    background-color: #7851a9; /* Royal purple */
+    color: #ffffff; /* White text */
     border: none;
     padding: 10px 20px;
     margin: 10px;
