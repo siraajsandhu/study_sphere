@@ -63,11 +63,11 @@
                                 <form action="/profile/classes", method="POST">
                                     <input type="hidden" value="{{this.class_name}}" name="className"/>
                                     <input type="hidden" value="{{this.class_id}}" name="classId"/>
-                                    <a href="/class/{{this.class_id}}" class="btn btn-primary" style="border-color: #7851a9; background-color: #ffffff" role="button">View Questions</a>
+                                    <a href="/class/{{this.class_id}}" class="btn btn-primary" style="border-color: #7851a9; background-color: #7851a9; text-color: #ffffff" role="button">View Questions</a>
                                     {{#if user}}
                                       <input type="submit" class="btn btn-outline-secondary" value="Join"/>
                                     {{else}}
-                                      <input disabled type="submit" class="btn btn-outline-secondary" style="border-color: #7851a9; background-color: #ffffff" value="Join"/>
+                                      <input disabled type="submit" class="btn btn-outline-secondary" style="border-color: #7851a9; background-color: #7851a9; text-color: #ffffff" value="Join"/>
                                     {{/if}}
                                 </form>
                             </div>
