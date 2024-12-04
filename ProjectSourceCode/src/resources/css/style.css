@@ -68,8 +68,7 @@ h1, h2, h3 {
 
 /* Footer */
 footer {
-    background-color: #7851a9!important;
-    color: #ffffff !important;
+    color: #ffffff;
     text-align: center;
     padding: 10px;
     position: fixed;
