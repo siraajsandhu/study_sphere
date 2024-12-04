@@ -1,43 +1,77 @@
-body{
-    background-color: rgba(82, 80, 80, 0.986);
+/* General Reset */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2; /* Neutral background */
+    color: #2e2e2e; /* Text color */
 }
-.c{
-    width: 100%;
-    margin: 0 auto;
+
+/* Header */
+header {
+    background-color: #7851a9; /* Royal purple */
+    color: #ffffff; /* White text */
+    padding: 20px;
     text-align: center;
-    color:rgb(181, 235, 235);
-}/* This simply forces the element to be center aligned and aligns the text to the center */
-.form-control {
-    margin-bottom: 15px;
-    display: block;      
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Buttons */
+button {
+    background-color: #7851a9; /* Royal purple */
+    color: #ffffff; /* White text */
+    border: #7851a9;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button.btn btn-primary{
+    background-color: #7851a9; /* Royal purple */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    margin: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #4a2681 !important; /* Slightly darker purple for hover effect */
+}
+
+/* Links */
+a {
+    color: #7851a9 !important; /* Royal purple for links */
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #6b47a1 !important; /* Darker purple for hover effect */
+}
+
+/* Section Headers */
+h1, h2, h3 {
+    color: #7851a9 !important; /* Royal purple for headings */
+}
+
+/* Cards or Boxes */
+.card {
+    background-color: #ffffff !important; /* White background */
+    border: 2px solid #7851a9 !important; /* Royal purple border */
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Footer */
+footer {
+    color: #ffffff;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    bottom: 0;
     width: 100%;
-    color:rgb(181, 235, 235);
 }
-.form-labelL {
-    text-align: left;  
-    display: block;     
-    margin-bottom: 5px; 
-} /* This just positions the text of the label to the left atop the buttons */
-a:active{
-    color:rgb(197, 53, 173);
-}
-a:visited{
-    color:rgb(90, 25, 79);
-}
-.btn-solo {
-    --bs-btn-font-weight: 600;
-    --bs-btn-color: #ffffff; 
-    --bs-btn-bg: #6c63ff; 
-    --bs-btn-border-color: #6c63ff;
-    --bs-btn-hover-color: #ffffff;
-    --bs-btn-hover-bg: #5a54e0; 
-    --bs-btn-hover-border-color: #5a54e0;
-    --bs-btn-focus-shadow-rgb: 108, 99, 255;
-    --bs-btn-active-color: #ffffff;
-    --bs-btn-active-bg: #504ac0;
-    --bs-btn-active-border-color: #504ac0;
-  }
-  
-/* .btn-primary {
-    background-color: darkorchid !important;
-} */

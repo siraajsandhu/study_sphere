@@ -42,7 +42,7 @@ Instructions will be added as features are implemented
 TODO
 
 # Link to App
-TODO
+https://study-sphere-res6.onrender.com/
 
 StudySphere1234@gmail.com
 InHexcode
