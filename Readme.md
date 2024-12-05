@@ -115,5 +115,5 @@ We use the following directory structure:
 - `Readme.md`
 
 # Link to App
-The app has been deployed using *Render* and is available at the following link:
-[https://study-sphere-res6.onrender.com/]()  
+The app has been deployed using *Render* and is available at the following link: 
+(https://study-sphere-res6.onrender.com)
