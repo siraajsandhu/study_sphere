@@ -13,6 +13,18 @@ const aws = require('aws-sdk');
 const fs = require('fs');
 const multer = require('multer');
 const uuid = require('uuid');
+const sass = require('sass');
+
+// compile Sass
+const compCss = sass.compile('./src/resources/scss/style.scss');
+fs.writeFileSync('./src/resources/css/style.css', compCss.css);
+console.log('COMPILED SCSS');
+
+
+
+
+
+
 
 // basic storage for messages
 const MESSAGE_STORE = new Map();
