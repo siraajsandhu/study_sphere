@@ -10,33 +10,44 @@
         <li class="nav-item">
             <a class="nav-link" href="/profile/bookmarks">Bookmarked Questions</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" href="/profile/asked">Asked Questions</a>
+        </li>
     </ul>
     <div class="container-fluid w-50 mt-3">
         <h2>My Classes</h2>
         {{> message}}
         {{!-- cards for user classes --}}
-        <div class="container-fluid saved mb-3">
-            <div class="row row-cols-2">
-                {{#each classes}}
-                    <div class="col mb-2 p-0 pe-2">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <a href="#">
-                                    <h5 class="card-title">{{this.class_name}}</h5>
-                                </a>
-                                <p class="card-text">{{this.class_desc}}</p>
-                            </div>
-                            <div class="card-footer">
-                                <form action="/profile/classes", method="POST">
-                                    <input type="hidden" value="{{this.class_name}}" name="className"/>
-                                    <input type="hidden" value="{{this.class_id}}" name="classId"/>
-                                    <input type="submit" class="btn btn-outline-danger" value="Remove class"/>
-                                </form>
+        {{#if classes.length}}
+            <div class="container-fluid saved mb-3">
+                <div class="row row-cols-2">
+                    {{#each classes}}
+                        <div class="col mb-2 p-0 pe-2">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <a href="/class/{{this.class_id}}">
+                                        <h5 class="card-title">{{this.class_name}}</h5>
+                                    </a>
+                                    <p class="card-text">{{this.class_desc}}</p>
+                                </div>
+                                <div class="card-footer">
+                                    <form action="/profile/classes", method="POST">
+                                        <input type="hidden" value="{{this.class_name}}" name="className"/>
+                                        <input type="hidden" value="{{this.class_id}}" name="classId"/>
+                                        <input type="submit" class="btn btn-outline-danger" value="Remove class"/>
+                                    </form>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {{/each}}
+                    {{/each}}
+                </div>
             </div>
-        </div>
+        {{else}}
+            <p>
+                You have not joined any classes. 
+                You can find some that interest you by browsing the 
+                <a href="/">class directory</a>
+            </p>
+        {{/if}}
     </div>
 </div>

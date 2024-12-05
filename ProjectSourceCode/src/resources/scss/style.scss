@@ -1,0 +1,55 @@
+@import "../../../node_modules/bootstrap-scss/bootstrap";
+
+[data-bs-theme="blue"] {
+  $accent: #7851a9;
+  $accent-dark: #62418c;
+  $accent-dis: #a26ce6;
+  
+  --bs-link-color: #{$accent};
+  --bs-link-hover-color: #{$accent-dark};
+  
+  --bs-nav-link-color: #{$accent};
+  --bs-nav-link-hover-color: #{$accent-dark};
+  
+  --bs-link-color-rgb: #{red($accent)}, #{green($accent)}, #{blue($accent)};
+  --bs-link-hover-color-rgb: #{red($accent-dark)}, #{green($accent-dark)}, #{blue($accent-dark)};
+
+  // --bs-body-color: var(--bs-white);
+  // --bs-body-color-rgb: #{to-rgb($white)};
+  // --bs-body-bg: var(--bs-blue);
+  // --bs-body-bg-rgb: #{to-rgb($blue)};
+  --bs-tertiary-bg: #{$accent-dark};
+
+  .navbar {
+    --bs-navbar-brand-color: #{$accent} !important;
+    --bs-navbar-brand-hover-color: #{$accent-dark} !important;
+  }
+
+  .dropdown-menu {
+    --bs-dropdown-link-hover-color: #{$white};
+  }
+
+  .btn-primary {
+    --bs-btn-bg: #{$accent};
+    --bs-btn-border-color: #{$accent};
+    --bs-btn-hover-bg: #{$accent-dark};
+    --bs-btn-hover-border-color: #{$accent-dark};
+
+    --bs-btn-active-bg: #{$accent};
+    --bs-btn-active-border-color: #{$accent};
+
+    --bs-btn-disabled-bg: #{$accent-dis};
+    --bs-btn-disabled-border-color: #{$accent-dis};
+  }
+
+  .btn-outline-primary {
+    --bs-btn-color: #{$accent};
+    --bs-btn-border-color: #{$accent};
+    --bs-btn-hover-bg: #{$accent-dark};
+    --bs-btn-hover-border-color: #{$accent-dark};
+    --bs-btn-active-bg: #{$accent};
+    --bs-btn-active-border-color: #{$accent};
+    --bs-btn-disabled-color: #{$accent-dis};
+    --bs-btn-disabled-border-color: #{$accent-dis};
+  }
+}
