@@ -20,12 +20,6 @@ const compCss = sass.compile('./src/resources/scss/style.scss');
 fs.writeFileSync('./src/resources/css/style.css', compCss.css);
 console.log('COMPILED SCSS');
 
-
-
-
-
-
-
 // basic storage for messages
 const MESSAGE_STORE = new Map();
 const BUCKET_NAME = 'studyspherebucket';
@@ -86,7 +80,7 @@ const db = pgp(dbConfig);
 // verify the database
 db.connect()
   .then(obj => {
-    console.log('Database connection successful'); // you can view this message in the docker compose logs
+    // console.log('Database connection successful'); // you can view this message in the docker compose logs
     obj.done(); // success, release the connection;
   })
   .catch(error => {
@@ -126,6 +120,12 @@ function genericFail(route, res, err) {
   });
 }
 
+/**
+ * DUMMY API(S)
+ */
+app.get('/welcome', (req, res) => {
+  res.json({status: 'success', message: 'Welcome!'});
+});
 
 /**
  * IMAGE ROUTE(S)
@@ -1049,7 +1049,7 @@ app.post('/profile/update', async (req, res) => {
     const profile = await db.one('SELECT * FROM users WHERE user_id = $1', [userId]);
     
     if (!await bcrypt.compare(oldPwd, profile.password)) {
-      return res.render('pages/profile_update', {
+      return res.status(400).render('pages/profile_update', {
         user: req.session.user,
         error: true,
         message: messages.profile_pwdMatchFailure(),
@@ -1060,7 +1060,7 @@ app.post('/profile/update', async (req, res) => {
     const pwdMatch = newPwd === confirmNewPwd;
 
     if (!(pwdIsValid && pwdMatch)) {
-      return res.render('pages/profile_update', {
+      return res.status(400).render('pages/profile_update', {
         user: req.session.user,
         error: true,
         message: messages.profile_invalidPwd(),
@@ -1071,7 +1071,7 @@ app.post('/profile/update', async (req, res) => {
     const query = `UPDATE users SET password = $1 WHERE user_id = $2`;
     await db.any(query, [newHash, userId]);
 
-    return res.render('pages/profile_update', {
+    return res.status(200).render('pages/profile_update', {
       user: req.session.user,
       error: false,
       message: messages.profile_pwdUpdateSuccess(),
@@ -1258,13 +1258,6 @@ app.get('/logout', (req, res) => {
   } else {
     res.redirect('/login');
   }
-});
-
-/**
- * DUMMY API(S)
- */
-app.get('/welcome', (req, res) => {
-  res.json({status: 'success', message: 'Welcome!'});
 });
 
 // start server

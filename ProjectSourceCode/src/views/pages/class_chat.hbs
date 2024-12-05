@@ -3,7 +3,7 @@
     <h6>&larr; Go back to <a href="/class/{{classInfo.id}}">{{classInfo.name}}</a></h6>
 
     <div class="border border-1 border-secondary rounded container-fluid w-100 d-flex flex-row ms-4 p-0" style="height: 90%;">
-      <div class="col-sm-3 m-0 p-3 border-end border-1 border-secondary" style="background-color:aliceblue;">
+      <div class="col-sm-3 m-0 p-3 border-end border-1 border-secondary" style="background-color:#c1a4e4;">
         <h5>Welcome to the chat for {{classInfo.name}}!</h5>
         <p>Feel free to discuss general topics from the class.</p>
         <p class="text-muted">Participating as <span class="fst-italic">{{user.username}}</span></p>
@@ -81,7 +81,9 @@
       const tr = document.createElement('tr');
       const td = new Array(3).fill().map(() => document.createElement('td'));
 
-      td[0].textContent = 'date';
+      const dateObj = new Date(date);
+
+      td[0].textContent = `${dateObj.getHours().toString().padStart(2,'0')}:${dateObj.getMinutes().toString().padStart(2,'0')}`;
       td[1].textContent = username;
       td[2].textContent = message;
 
