@@ -6,7 +6,7 @@
 - **Diego Castro** (*Email: dica7660@colorado.edu; GitHub: `diego-A-castro`*)
 - **Siraaj Sandhu** (*Email: sisa8612@colorado.edu; GitHub: `siraajsandhu`*)
   - *Note from Siraaj: I occasionally contributed on my 2nd account, `saaaji`*
-- **Jun Kusano** (*Email: juku2287@colorado.edu; GitHub: `juku2287`*)
+- **Jun Kusano** (*Email: juku2287@colorado.edu; GitHub: `junnkusano`*)
 
 # App Description: 
 Study Sphere is a homework-help website where students can ask and answer questions
